@@ -71,9 +71,90 @@ HI = {
     "taaki": "ताकि", "chhupa": "छुपा", "chupa": "छुपा", "nazar": "नज़र", "sauda": "सौदा", "badla": "बदला", "badal": "बदल", "badalta": "बदलता",
     "yaar": "यार", "bhai": "भाई", "arre": "अरे", "are": "अरे", "acha": "अच्छा", "hazaron": "हज़ारों", "lakhon": "लाखों", "croron": "करोड़ों", "karodon": "करोड़ों",
 }
-# Roman words that are ALSO English words: Hindi only when their neighbours are Hindi
-AMBIG = {"do", "the", "to", "is", "us", "in", "un", "main", "me", "par", "pe", "ban", "bas", "log", "ab", "hum", "ho", "hi", "na", "mat", "din",
-         "kar", "jab", "tab", "sab", "use", "are", "di", "li", "ja", "fir", "pata", "bole", "kal", "har", "jo", "kam", "das", "koi", "bhai"}
+# more everyday Hinglish (business-explainer vocabulary); hand-checked, beats the transliteration API
+HI.update({
+    "bees": "बीस", "tees": "तीस", "chalis": "चालीस", "chaalis": "चालीस", "pachaas": "पचास", "pachas": "पचास", "sattar": "सत्तर", "assi": "अस्सी",
+    "nabbe": "नब्बे", "gyarah": "ग्यारह", "barah": "बारह", "pandrah": "पंद्रह", "dedh": "डेढ़", "dhai": "ढाई", "sawa": "सवा", "saadhe": "साढ़े",
+    "aadha": "आधा", "adha": "आधा", "aadhi": "आधी", "doguna": "दोगुना", "dugna": "दोगुना", "chauthai": "चौथाई", "navaasi": "नवासी",
+    "kya": "क्या", "kyun": "क्यों", "kyon": "क्यों", "kaisa": "कैसा", "kaisi": "कैसी", "kahan": "कहाँ", "kab": "कब", "kaun": "कौन", "kis": "किस",
+    "kisne": "किसने", "kisi": "किसी", "kisko": "किसको", "kitna": "कितना", "balki": "बल्कि", "tabhi": "तभी", "jabki": "जबकि", "isiliye": "इसीलिए",
+    "asal": "असल", "darasal": "दरअसल", "haalaanki": "हालांकि", "halanki": "हालांकि", "achanak": "अचानक", "turant": "तुरंत", "foran": "फ़ौरन",
+    "der": "देर", "baar": "बार", "baaki": "बाकी", "baki": "बाकी", "kayi": "कई", "kai": "कई", "zyadatar": "ज़्यादातर", "zyaadatar": "ज़्यादातर",
+    "kareeb": "करीब", "kareeban": "करीबन", "takreeban": "तकरीबन", "apna": "अपना", "apni": "अपनी", "apne": "अपने", "sabka": "सबका", "sabko": "सबको",
+    "sabki": "सबकी", "sabke": "सबके", "kuchh": "कुछ", "kaafi": "काफ़ी", "kafi": "काफ़ी", "keval": "केवल", "kewal": "केवल", "aakhirkar": "आख़िरकार",
+    "akhirkar": "आख़िरकार", "vaise": "वैसे", "yaa": "या", "wapas": "वापस", "vapas": "वापस", "parso": "परसों", "baad": "बाद", "paas": "पास",
+    "kamana": "कमाना", "kamate": "कमाते", "kamata": "कमाता", "kamati": "कमाती", "kamaye": "कमाए", "kamaayi": "कमाई", "gawana": "गंवाना",
+    "gawate": "गंवाते", "gawaya": "गंवाया", "gawa": "गंवा", "ganwa": "गंवा", "ganwate": "गंवाते", "ganwaya": "गंवाया", "ganwana": "गंवाना",
+    "khona": "खोना", "khoya": "खोया", "khoyi": "खोई", "khote": "खोते", "keh": "कह", "kehna": "कहना", "kehti": "कहती", "kehne": "कहने",
+    "kaho": "कहो", "kahiye": "कहिए", "kahi": "कही", "kahe": "कहे", "samjhenge": "समझेंगे", "samjhe": "समझे", "samajh": "समझ", "samajhna": "समझना",
+    "samjhaate": "समझाते", "samjhata": "समझाता", "samjhana": "समझाना", "nikal": "निकल", "nikla": "निकला", "nikli": "निकली", "nikle": "निकले",
+    "nikalna": "निकलना", "nikalta": "निकलता", "nikalti": "निकलती", "nikalte": "निकलते", "nikala": "निकाला", "nikali": "निकाली", "nikale": "निकाले",
+    "dikhta": "दिखता", "dikhti": "दिखती", "dikhte": "दिखते", "dikha": "दिखा", "dikhi": "दिखी", "dikhe": "दिखे", "dikhaya": "दिखाया",
+    "dikhata": "दिखाता", "dikhana": "दिखाना", "dikhai": "दिखाई", "bolega": "बोलेगा", "bolta": "बोलता", "bolti": "बोलती", "bolte": "बोलते",
+    "bolna": "बोलना", "shuruaat": "शुरुआत", "shuruat": "शुरुआत", "shuru": "शुरू", "farak": "फ़र्क", "fark": "फ़र्क", "farq": "फ़र्क",
+    "baadh": "बाढ़", "poore": "पूरे", "purane": "पुराने", "puraane": "पुराने", "kijiye": "कीजिए", "kariye": "करिए", "dijiye": "दीजिए",
+    "lijiye": "लीजिए", "shehron": "शहरों", "shehro": "शहरों", "gaon": "गांव", "gaanv": "गांव", "kasba": "कस्बा", "sabak": "सबक", "seekh": "सीख",
+    "sikh": "सीख", "seekha": "सीखा", "sikha": "सीखा", "seekhna": "सीखना", "aa": "आ", "aana": "आना", "aaega": "आएगा", "aayega": "आएगा",
+    "aayegi": "आएगी", "aaenge": "आएंगे", "kamyaabi": "कामयाबी", "kamyabi": "कामयाबी", "safalta": "सफलता", "safar": "सफ़र", "sapne": "सपने",
+    "mehnat": "मेहनत", "bharosa": "भरोसा", "vishwas": "विश्वास", "imaandari": "ईमानदारी", "zimmedari": "ज़िम्मेदारी", "faisla": "फ़ैसला",
+    "faisle": "फ़ैसले", "ladai": "लड़ाई", "jung": "जंग", "takkar": "टक्कर", "muqabla": "मुक़ाबला", "mukabla": "मुक़ाबला", "khiladi": "खिलाड़ी",
+    "khiladiyon": "खिलाड़ियों", "maalik": "मालिक", "malik": "मालिक", "naukri": "नौकरी", "kisaan": "किसान", "kisan": "किसान",
+    "dukaandaar": "दुकानदार", "dukandar": "दुकानदार", "vyapaar": "व्यापार", "vyapar": "व्यापार", "dhandha": "धंधा", "dhanda": "धंधा",
+    "karobaar": "कारोबार", "sarkaar": "सरकार", "sarkar": "सरकार", "kanoon": "कानून", "niyam": "नियम", "aam": "आम", "aadmi": "आदमी",
+    "insaan": "इंसान", "parivaar": "परिवार", "parivar": "परिवार", "shaadi": "शादी", "bachche": "बच्चे", "bacche": "बच्चे", "maa": "माँ",
+    "zindagi": "ज़िंदगी", "mulk": "मुल्क", "rajya": "राज्य", "sadak": "सड़क", "raasta": "रास्ता", "rasta": "रास्ता", "gaadi": "गाड़ी", "gadi": "गाड़ी",
+    "cheez": "चीज़", "cheezein": "चीज़ें", "cheezon": "चीज़ों", "saamaan": "सामान", "saman": "सामान", "maal": "माल", "daam": "दाम", "daamon": "दामों",
+    "laagat": "लागत", "lagat": "लागत", "kharche": "खर्चे", "kharchon": "खर्चों", "aamdani": "आमदनी", "munafe": "मुनाफ़े", "karz": "कर्ज़",
+    "karza": "कर्ज़ा", "udhaar": "उधार", "bachat": "बचत", "nivesh": "निवेश", "hissedari": "हिस्सेदारी", "hisse": "हिस्से", "hisaab": "हिसाब",
+    "hisab": "हिसाब", "aankde": "आंकड़े", "ankde": "आंकड़े", "jugaad": "जुगाड़", "jugad": "जुगाड़", "raaz": "राज़", "jhooth": "झूठ",
+    "galti": "ग़लती", "galtiyan": "ग़लतियाँ", "khatra": "ख़तरा", "khatre": "ख़तरे", "dar": "डर", "umeed": "उम्मीद", "ummeed": "उम्मीद",
+    "iraada": "इरादा", "maqsad": "मक़सद", "tarakki": "तरक्की", "badhat": "बढ़त", "giravat": "गिरावट", "girawat": "गिरावट", "uchaal": "उछाल",
+    "chhalang": "छलांग", "raftaar": "रफ़्तार", "raftar": "रफ़्तार", "zor": "ज़ोर", "taakat": "ताक़त", "takat": "ताक़त", "kamzori": "कमज़ोरी",
+    "mauka": "मौका", "mauke": "मौके", "daur": "दौर", "zamana": "ज़माना", "zamane": "ज़माने", "shuruati": "शुरुआती", "aakhri": "आख़िरी",
+    "akhri": "आख़िरी", "agla": "अगला", "agli": "अगली", "agle": "अगले", "pichhla": "पिछला", "pichhle": "पिछले", "pichhli": "पिछली",
+    "pichle": "पिछले", "pichla": "पिछला", "pichhe": "पीछे", "badhiya": "बढ़िया", "behtar": "बेहतर", "behtareen": "बेहतरीन", "kharab": "ख़राब",
+    "khaas": "ख़ास", "khas": "ख़ास", "alag": "अलग", "ajeeb": "अजीब", "anokha": "अनोखा", "hairaan": "हैरान", "hairan": "हैरान",
+    "mumkin": "मुमकिन", "namumkin": "नामुमकिन", "zabardast": "ज़बरदस्त", "bhaari": "भारी", "bhari": "भारी", "halka": "हल्का", "lamba": "लंबा",
+    "lambi": "लंबी", "lambe": "लंबे", "gehra": "गहरा", "saaf": "साफ़", "mehenge": "महंगे", "mehnga": "महंगा", "saste": "सस्ते", "ameer": "अमीर",
+    "amir": "अमीर", "gareeb": "गरीब", "garib": "गरीब", "majboor": "मजबूर", "mazboot": "मज़बूत", "majboot": "मज़बूत", "kamzor": "कमज़ोर",
+    "taaza": "ताज़ा", "khush": "ख़ुश", "pareshan": "परेशान", "pareshaan": "परेशान", "badha": "बढ़ा", "badhi": "बढ़ी", "badhe": "बढ़े",
+    "badhta": "बढ़ता", "badhti": "बढ़ती", "badhte": "बढ़ते", "badhna": "बढ़ना", "badhaya": "बढ़ाया", "badhane": "बढ़ाने", "badhana": "बढ़ाना",
+    "gira": "गिरा", "giri": "गिरी", "gire": "गिरे", "girta": "गिरता", "girne": "गिरने", "ghata": "घटा", "ghati": "घटी", "chala": "चला",
+    "chali": "चली", "chale": "चले", "chalta": "चलता", "chalti": "चलती", "chalte": "चलते", "chalana": "चलाना", "chalaya": "चलाया",
+    "chalate": "चलाते", "khola": "खोला", "kholi": "खोली", "khole": "खोले", "kholna": "खोलना", "khareeda": "ख़रीदा", "kharida": "ख़रीदा",
+    "kharidne": "ख़रीदने", "khareedne": "ख़रीदने", "kharidte": "ख़रीदते", "khareedte": "ख़रीदते", "becha": "बेचा", "bechi": "बेची", "beche": "बेचे",
+    "bechna": "बेचना", "bechte": "बेचते", "bechta": "बेचता", "bechne": "बेचने", "mila": "मिला", "mili": "मिली", "milta": "मिलता", "milti": "मिलती",
+    "milte": "मिलते", "milna": "मिलना", "milega": "मिलेगा", "milegi": "मिलेगी", "milenge": "मिलेंगे", "pahuncha": "पहुंचा", "pahunchi": "पहुंची",
+    "pahunche": "पहुंचे", "pahunchna": "पहुंचना", "pahunchane": "पहुंचाने", "bacha": "बचा", "bachi": "बची", "bache": "बचे", "bachana": "बचाना",
+    "bachaya": "बचाया", "bachane": "बचाने", "jeete": "जीते", "jeetna": "जीतना", "haare": "हारे", "haarna": "हारना", "toda": "तोड़ा", "todi": "तोड़ी",
+    "tode": "तोड़े", "todna": "तोड़ना", "tod": "तोड़", "joda": "जोड़ा", "jode": "जोड़े", "jodna": "जोड़ना", "jod": "जोड़", "sochte": "सोचते",
+    "sochta": "सोचता", "sochna": "सोचना", "lage": "लगे", "lagaya": "लगाया", "lagayi": "लगाई", "lagaye": "लगाए", "lagana": "लगाना",
+    "lagate": "लगाते", "lagata": "लगाता", "dikkat": "दिक्कत", "uthaya": "उठाया", "uthaye": "उठाए", "uthana": "उठाना", "utha": "उठा",
+    "ruka": "रुका", "ruki": "रुकी", "ruke": "रुके", "rukna": "रुकना", "rok": "रोक", "roka": "रोका", "rokne": "रोकने", "chhoda": "छोड़ा",
+    "chhodi": "छोड़ी", "chhode": "छोड़े", "chhodna": "छोड़ना", "chhod": "छोड़", "pakda": "पकड़ा", "pakdi": "पकड़ी", "pakad": "पकड़",
+    "maante": "मानते", "maanta": "मानता", "maan": "मान", "jaanta": "जानता", "jaanti": "जानती", "chuka": "चुका", "chuki": "चुकी", "chuke": "चुके",
+    "paana": "पाना", "paaya": "पाया", "paate": "पाते", "paata": "पाता", "paati": "पाती", "paaye": "पाए", "rakhna": "रखना", "rakhta": "रखता",
+    "rakhte": "रखते", "rakho": "रखो", "bata": "बता", "bataya": "बताया", "batata": "बताता", "batate": "बताते", "batana": "बताना", "batayi": "बताई",
+    "puchha": "पूछा", "poocha": "पूछा", "puchhte": "पूछते", "poochte": "पूछते", "suna": "सुना", "sunte": "सुनते", "chahe": "चाहे", "chaha": "चाहा",
+    "chahti": "चाहती", "chahenge": "चाहेंगे", "hoke": "होके", "hokar": "होकर", "banake": "बनाके", "banakar": "बनाकर", "banane": "बनाने",
+    "banate": "बनाते", "banata": "बनाता", "banaye": "बनाए", "jud": "जुड़", "jude": "जुड़े", "juda": "जुड़ा", "judi": "जुड़ी", "judna": "जुड़ना",
+    "ghoom": "घूम", "ghoomta": "घूमता", "ghumta": "घूमता", "ghoomti": "घूमती", "ghoomte": "घूमते", "laut": "लौट", "lauta": "लौटा",
+    "lautaya": "लौटाया", "maanga": "मांगा", "maangte": "मांगते", "mangte": "मांगते", "de": "दे", "dega": "देगा", "degi": "देगी", "denge": "देंगे",
+    "dene": "देने", "le": "ले", "lega": "लेगा", "legi": "लेगी", "lenge": "लेंगे", "lene": "लेने", "hona": "होना", "hone": "होने", "raho": "रहो",
+    "rahega": "रहेगा", "rahegi": "रहेगी", "rahenge": "रहेंगे", "jaayega": "जाएगा", "jayega": "जाएगा", "jaayegi": "जाएगी", "jayegi": "जाएगी",
+    "jaayenge": "जाएंगे", "jayenge": "जाएंगे", "jaenge": "जाएंगे", "jaane": "जाने", "sakenge": "सकेंगे", "sakega": "सकेगा", "padta": "पड़ता",
+    "padti": "पड़ती", "padte": "पड़ते", "pada": "पड़ा", "padi": "पड़ी", "pade": "पड़े", "padega": "पड़ेगा", "padegi": "पड़ेगी",
+    "mile": "मिले", "door": "दूर", "sun": "सुन", "man": "मन", "ban": "बन", "bana": "बना",
+})
+# Roman words that are ALSO everyday English words. Hinglish means Hindi far more often, so these are Hindi unless they sit
+# inside English (English on both sides, numbers count as their other neighbour) or a word rule below says otherwise.
+AMBIG = {"do", "the", "to", "is", "us", "in", "un", "main", "me", "use", "are", "ban", "log", "mile", "door", "sun", "man"}
+# short English words Hinglish writers use as-is (too short for the English frequency list)
+EN_SHORT = {"ad", "app", "vs", "ok", "id", "ui", "ux", "ai", "tv", "pc", "hr", "pr", "ca"}
+# "ban" is Hindi बन before these, English "ban" (prohibition) next to the others
+BAN_HI = {"gaya", "gayi", "gaye", "jaata", "jata", "jaati", "jati", "jaate", "jate", "jaaye", "jaye", "jaayega", "jayega", "jaenge", "jaayenge",
+          "sakta", "sakti", "sakte", "raha", "rahi", "rahe", "chuka", "chuki", "chuke", "ke", "kar", "na", "jaana", "jaane", "paaya", "paya", "payi"}
+BAN_EN = {"laga", "lagaya", "lagayi", "lagaa", "lag", "lagi", "lagega", "lagne", "lagana", "hai", "hua", "hui", "kiya", "kiye", "karna", "karne", "karte"}
 
 ONES = ("शून्य एक दो तीन चार पांच छह सात आठ नौ दस ग्यारह बारह तेरह चौदह पंद्रह सोलह सत्रह अठारह उन्नीस बीस इक्कीस बाईस तेईस चौबीस "
         "पच्चीस छब्बीस सत्ताईस अट्ठाईस उनतीस तीस इकतीस बत्तीस तैंतीस चौंतीस पैंतीस छत्तीस सैंतीस अड़तीस उनतालीस चालीस इकतालीस बयालीस "
@@ -276,6 +357,8 @@ def tokens(text, extra_lex=None, online=True):
             t.update(lang="en", tts=[])
         elif core.isupper() and len(core) > 1 or (core[0].isupper() and i > 0 and not raw[i - 1].endswith((".", "?", "!"))):
             t.update(lang="en", tts=[core])  # acronym or proper noun mid-sentence: always Latin
+        elif low in EN_SHORT or low.rstrip("s") in EN_SHORT and len(low) > 2:
+            t.update(lang="en", tts=[core])
         elif low in HI and low not in AMBIG:
             t.update(lang="hi", tts=[HI[low]])
         elif low in AMBIG:
@@ -288,22 +371,44 @@ def tokens(text, extra_lex=None, online=True):
             t.update(lang="hi?", tts=[core])  # unknown Roman word: treat as Hindi, transliterate
         toks.append(t)
         i += 1
-    # ambiguous words follow their neighbours
+    # ambiguous words: Hindi unless surrounded by English (see AMBIG)
+    def side(k, d):
+        j = k + d
+        if j < 0 or j >= len(toks):
+            return None
+        if d < 0 and re.search(r"[.?!।]$", toks[j]["post"] or "") or d > 0 and re.search(r"[.?!।,;:]$", toks[k]["post"] or ""):
+            return None  # don't look across sentence ends / commas
+        return toks[j]["lang"]
     for k, t in enumerate(toks):
-        if t["lang"] == "?":
-            near = [x["lang"] for x in toks[max(0, k - 2):k] + toks[k + 1:k + 3] if x["lang"] not in ("?", "num")]
-            hi = sum(l.startswith("hi") for l in near)
-            en = sum(l == "en" for l in near)
-            low = t["core"].lower()
-            nx = toks[k + 1] if k + 1 < len(toks) else None
-            if low == "do":  # Hinglish writers say "karo" for English "do": "do" is almost always the number two
-                hi, en = (0, 1) if nx and nx["core"].lower() in {"not", "you", "it", "this", "that", "we", "they", "a", "an", "so", "what", "more", "something", "anything", "nothing", "well"} else (1, 0)
-            elif low == "the":  # English "the" sits before an English noun; Hindi "थे" ends a clause ("market mein the, toh")
-                hi, en = (0, 1) if nx and nx["lang"] == "en" and not t["post"] else (1, 0)
-            if hi >= en and low in HI:
-                t.update(lang="hi", tts=[HI[low]])
-            else:
-                t["lang"] = "en"
+        if t["lang"] != "?":
+            continue
+        low = t["core"].lower()
+        p, n = side(k, -1), side(k, 1)
+        p, n = (n if p == "num" else p), (p if n == "num" else n)
+        nx = toks[k + 1]["core"].lower() if k + 1 < len(toks) else ""
+        nx2 = toks[k + 2]["core"].lower() if k + 2 < len(toks) else ""
+        pv = toks[k - 1]["core"].lower() if k else ""
+        en = p == "en" and n == "en"
+        if low == "do":  # Hinglish writers say "karo" for English "do": "do" is almost always the number two
+            en = nx in {"not", "you", "it", "this", "that", "we", "they", "a", "an", "so", "what", "more", "something", "anything", "nothing", "well"}
+        elif low == "the":  # English "the" sits before an English noun; Hindi "थे" ends a clause ("market mein the, toh")
+            en = n == "en" and not t["post"]
+        elif low == "main":  # "iska main reason" vs "main bataunga"
+            en = n == "en" and not toks[k + 1]["core"][:1].isupper()
+        elif low == "use":  # "use karte hain" = English use; "use pata tha" = उसे
+            en = nx.startswith(("kar", "kiy", "hot", "hon", "case")) or en
+        elif low == "ban":
+            en = (nx in BAN_EN or pv in {"pe", "par", "ka", "ki", "ko", "ek", "yeh", "ye", "is", "poora", "pura"} or en) and not (nx in BAN_HI and not (nx == "kar" and nx2.startswith(("di", "de", "do"))))
+            if nx == "kar" and nx2.startswith(("di", "de", "do")):
+                en = True
+        elif low == "log":
+            en = nx in {"in", "out", "kiya", "karo", "karte", "karna", "file"} or en
+        elif low == "mile":
+            en = toks[k - 1]["lang"] == "num" if k else False
+        if not en and low in HI:
+            t.update(lang="hi", tts=[HI[low]])
+        else:
+            t["lang"] = "en"
     KI_AFTER = {"hai", "tha", "thi", "the", "kaha", "bola", "bole", "socha", "lagta", "pata", "matlab", "yeh", "ye", "taaki", "hain", "dekha", "samjha", "maana"}
     for k, t in enumerate(toks):
         if t["core"].lower() == "ki" and k and (toks[k - 1]["post"].startswith(",") or toks[k - 1]["core"].lower() in KI_AFTER):

@@ -290,9 +290,11 @@ def candidates():
     eng = H.english()
     seen = {}
     for L in lines:
-        for t in H.tokens(L["text"], online=False):
+        toks = H.tokens(L["text"], online=False)
+        for k, t in enumerate(toks):
             c = re.sub(r"['’]s$", "", t["core"])
-            if t["lang"] == "en" and c[:1].isupper() and c.lower() not in eng and c.lower() not in lex and not c.isupper():
+            mid = k > 0 and not re.search(r"[.?!]$", toks[k - 1]["post"] or "")  # capitalised mid-sentence = a name, even "Kite"
+            if t["lang"] == "en" and c[:1].isupper() and (c.lower() not in eng or mid) and c.lower() not in lex and not c.isupper():
                 seen.setdefault(c, L["text"])
             elif t["lang"] == "en" and c.isupper() and 2 <= len(c) <= 6 and c.lower() not in lex:
                 seen.setdefault(c, L["text"])
