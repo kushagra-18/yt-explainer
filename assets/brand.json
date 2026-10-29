@@ -1,0 +1,19 @@
+{
+  "_note": "Channel identity. Every video uses this; a video's front matter can override `accent` (the featured brand's colour) and `channel`.",
+  "channel": { "name": "", "handle": "", "tagline": "" },
+  "palette": {
+    "bg": "#FBE6EE",
+    "bg2": "#F3CFDC",
+    "card": "#FFF8F2",
+    "ink": "#13293D",
+    "accent": "#FF5A36",
+    "yellow": "#FFC233",
+    "teal": "#2F8F83",
+    "series": ["#13293D", "#FF5A36", "#2F8F83", "#FFC233", "#7A2E8E", "#3A86FF"],
+    "good": "#2F8F83",
+    "bad": "#E63946"
+  },
+  "fonts": { "display": "Khand", "body": "Palanquin" },
+  "voice": { "speaker": "aryaman_hi_ads", "model": "bulbul:v4-flash", "pace": 1.2, "temperature": 0.6, "language": "hi-IN" },
+  "video": { "width": 1920, "height": 1080, "fps": 30 }
+}

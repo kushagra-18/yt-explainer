@@ -1,0 +1,56 @@
+#!/bin/bash
+# yt — YouTube explainer pipeline. Run inside a video folder (~/yt-explainers/videos/<slug>), except `yt new`.
+#
+#   yt new <slug>              scaffold a video folder (video.md template, fonts)
+#   yt plan                    check video.md; print scenes, times and every scene's spoken words (cue vocabulary)
+#   yt build                   check + build index.html
+#   yt tts "line"              show what the voice will receive for a line (Devanagari/Latin split, numbers)
+#   yt say "line"              speak a line with the channel voice -> wav path (inside a video folder: uses its say:)
+#   yt names                   audition proper nouns not in the lexicon -> names/  ;  yt names pick Zepto=1 ...
+#   yt voice [ids...]          Sarvam voiceover for every line (cached); ids = re-roll those lines
+#   yt assets                  fetch images listed under img: in video.md front matter (+ cutouts)
+#   yt qa [t1 t2 ...]          snapshots (scene middles or given times) -> qa/sheet-*.jpg ; LOOK at them
+#   yt preview [from] [to]     render a slice with audio -> renders/preview.mp4 (default 0-60 s)
+#   yt audio                   music + SFX + voice mix -> .yt/mix.wav
+#   yt render                  full render by segments (cached per segment) + mix -> renders/<slug>.mp4
+#   yt pack                    SRT captions + chapters + description -> upload/
+set -euo pipefail
+K="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+HF="npx -y hyperframes@0.8.162"
+PY="${YT_PY:-$HOME/yt-explainers/.venv/bin/python}"
+[ -x "$PY" ] || PY=python3
+VIDEOS="${YT_VIDEOS:-$HOME/yt-explainers/videos}"
+cmd="${1:-help}"; shift || true
+
+need_project() { [ -f video.md ] || { echo "run this inside a video folder (no video.md here)"; exit 1; }; }
+fonts() { mkdir -p assets/fonts; cp -n "$K"/assets/fonts/*.ttf assets/fonts/ 2>/dev/null || true; }
+slug() { basename "$PWD"; }
+
+case "$cmd" in
+  new)
+    S="${1:?usage: yt new <slug>}"; P="$VIDEOS/$S"
+    [ -e "$P" ] && { echo "exists: $P"; exit 1; }
+    mkdir -p "$P"/{assets/img,assets/fonts,renders,qa,upload,.yt}
+    cp "$K/examples/template.md" "$P/video.md"
+    cp "$K"/assets/fonts/*.ttf "$P/assets/fonts/"
+    printf 'renders/\nqa/\n.yt/\n_seg*.html\n_range.html\nindex.html\nnames/\n' > "$P/.gitignore"
+    cat > "$P/hyperframes.json" <<'JSON'
+{ "$schema": "https://hyperframes.heygen.com/schema/hyperframes.json", "paths": { "assets": "assets" }, "media": { "autoProxy": true } }
+JSON
+    printf '# %s\nGenerated video. Edit only video.md (+ assets/img). Guide: %s/SKILL.md\n' "$S" "$K" > "$P/AGENTS.md"
+    ln -s AGENTS.md "$P/CLAUDE.md"
+    echo "$P" ;;
+  plan) need_project; node "$K/engine/build.mjs" --plan ;;
+  build) need_project; fonts; node "$K/engine/build.mjs" ;;
+  tts) "$PY" "$K/engine/hinglish.py" "$@" ;;
+  say) "$PY" "$K/engine/voice.py" say "$@" ;;
+  names) need_project; node "$K/engine/build.mjs" --plan >/dev/null || true; "$PY" "$K/engine/voice.py" names "$@" ;;
+  voice) need_project; node "$K/engine/build.mjs" --plan >/dev/null || { node "$K/engine/build.mjs" --plan | tail -20; exit 1; }; "$PY" "$K/engine/voice.py" "$@"; node "$K/engine/build.mjs" --plan | tail -3 ;;
+  assets) need_project; node "$K/engine/build.mjs" --plan >/dev/null || true; "$PY" "$K/engine/assets.py" "$@" ;;
+  qa) need_project; fonts; bash "$K/engine/qa.sh" "$K" "$@" ;;
+  audio) need_project; node "$K/engine/build.mjs" >/dev/null; bash "$K/engine/sfxdump.sh" "$K"; "$PY" "$K/engine/audio.py" "$@" ;;
+  preview) need_project; fonts; bash "$K/engine/render.sh" "$K" preview "${1:-0}" "${2:-60}" ;;
+  render) need_project; fonts; bash "$K/engine/render.sh" "$K" full ;;
+  pack) need_project; node "$K/engine/pack.mjs" ;;
+  *) sed -n 2,17p "$0" ;;
+esac
