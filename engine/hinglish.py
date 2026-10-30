@@ -74,7 +74,7 @@ HI = {
 # more everyday Hinglish (business-explainer vocabulary); hand-checked, beats the transliteration API
 HI.update({
     "bees": "बीस", "tees": "तीस", "chalis": "चालीस", "chaalis": "चालीस", "pachaas": "पचास", "pachas": "पचास", "sattar": "सत्तर", "assi": "अस्सी",
-    "nabbe": "नब्बे", "gyarah": "ग्यारह", "barah": "बारह", "pandrah": "पंद्रह", "dedh": "डेढ़", "dhai": "ढाई", "sawa": "सवा", "saadhe": "साढ़े",
+    "nabbe": "नब्बे", "gyarah": "ग्यारह", "barah": "बारह", "pandrah": "पंद्रह", "dedh": "डेढ़", "dhai": "ढाई", "sawa": "सवा", "saadhe": "साढ़े", "saade": "साढ़े", "sade": "साढ़े", "saare": "सारे", "sare": "सारे", "saara": "सारा", "saari": "सारी",
     "aadha": "आधा", "adha": "आधा", "aadhi": "आधी", "doguna": "दोगुना", "dugna": "दोगुना", "chauthai": "चौथाई", "navaasi": "नवासी",
     "kya": "क्या", "kyun": "क्यों", "kyon": "क्यों", "kaisa": "कैसा", "kaisi": "कैसी", "kahan": "कहाँ", "kab": "कब", "kaun": "कौन", "kis": "किस",
     "kisne": "किसने", "kisi": "किसी", "kisko": "किसको", "kitna": "कितना", "balki": "बल्कि", "tabhi": "तभी", "jabki": "जबकि", "isiliye": "इसीलिए",
