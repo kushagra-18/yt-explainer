@@ -55,10 +55,13 @@ Unknown word → `yt plan` prints the scene's spoken words. Without `at`, items 
 (auto-rotated otherwise; chapters use paper) · `cam: in|out|left|right|up|still` slow camera (default in) ·
 `src: "Tofler, FY24"` small source tag (use on every data scene) · `lower: {name, role, at}` lower third.
 
-## Pacing rules
-- 6-12 s per scene (≈ 15-30 words). Longer → split the paragraph and give it a second layout.
-- Never the same layout twice in a row; ≤ 3 data scenes in a row; a people/map/photo/headlines/ink-statement
-  pattern interrupt every 20-40 s.
+## Pacing rules (user decision: ~50 % motion, 30 % data, 20 % text/photo)
+- 6-12 s per scene (≈ 15-30 words). Longer → split the paragraph and give it a second layout. Motion scenes
+  (ride, cutaway, network, chain, cash, iso, people) may run 10-16 s — they carry the story.
+- **Show, don't chart**: whenever the narration describes something happening (a delivery, a store working,
+  expansion, money burning, goods moving, a founder deciding), use a motion scene. Charts only when the
+  number itself is the point. Never more than 2 data scenes in a row.
+- Never the same layout twice in a row; a pattern interrupt every 20-40 s.
 - Chapter openers: statement or photo; chapter closers: an open loop line on a statement.
 - Brand colours for brands (`color:` in data rows), accent for the brand the video is about.
 
@@ -172,6 +175,53 @@ Unknown word → `yt plan` prints the scene's spoken words. Without `at`, items 
 (notifications), `points: ["..."]` beside it, `side`, `screenBg`.
 ```
 @phone {title: "Kite app", cards: [{title: "Kite", text: "Order executed: 10 shares", icon: "check-circle", color: "#387ED1"}], points: ["Simple design", "Zero ads"]}
+```
+
+## Motion scenes (isometric world — the default way to SHOW the business)
+Colourful isometric city/buildings/vehicles/people; everything moves (traffic, walkers, workers). Brand colour = `accent`.
+Node kinds everywhere: darkstore, shop, kirana, restaurant, warehouse, factory, farm, home, tower, office, bank, phone.
+Vehicles: scooter, bike, car, auto, van, truck, bus.
+
+**ride** — a vehicle crosses the city A → B, camera follows, route draws, timer counts, "Delivered" stamp.
+`vehicle`, `from: {label, kind, icon}`, `to: {label, kind, icon}`, `at: [depart cue, arrive cue]`, `timer: "10 min"` | false,
+`dist: "1.8 km"`, `done: "Delivered"`, `city: city|suburb`. Uses: quick delivery, cab ride, logistics speed, a customer journey.
+```
+@ride {title: "10 minute *delivery*", vehicle: "scooter", from: {label: "Zepto dark store", kind: "darkstore"}, to: {label: "Aapka ghar", kind: "home"}, timer: "8.5 min", dist: "1.8 km", at: ["nikla", "pahunch"]}
+```
+
+**cutaway** — building exterior, then the front walls drop and roof lifts: the inside is working.
+`kind: darkstore|warehouse|factory|kitchen|office|kirana`, `sign`, `at` (open cue), `labels: [{text, zone, at}]`
+(zones — darkstore: shelves packing dispatch pickers · warehouse: racks dock staff · factory: line machines workers ·
+kitchen: stoves counter chefs · office: team · kirana: shelves counter customers), `orders: 4 | [{text, title, at}]`
+(phone notifications), `count: {value, label, at}`. Uses: how a dark store / cloud kitchen / factory / office works.
+```
+@cutaway {kind: "darkstore", sign: "Zepto", at: "andar", orders: 3, labels: [{text: "5,000+ items", zone: "shelves", at: "shelves"}, {text: "Packing: 60 sec", zone: "packing", at: "packing"}], count: {value: "1,200", label: "orders / din"}}
+```
+
+**network** — city from above; stores pop up with radius rings, riders zip out. `stores: 9 | [{label, at, kind}]`,
+`kind`, `radius: "2 km"`, `riders` (per store), `count: {value, label, at}`, `city`, `zoom`. Uses: expansion, coverage, density.
+```
+@network {title: "Har *2 km* pe ek store", stores: 9, radius: "2 km", count: {value: "350", label: "dark stores"}}
+```
+
+**chain** — supply chain on a road, vehicles carry goods node to node, camera pans. `steps: [{kind, label, sub, icon,
+edge: "+12%", vehicle, at}]` (2-5), `token: cash` (coin rides along). Uses: farm-to-home, margins at each step, distribution.
+```
+@chain {title: "Saaman kaise pahunchta hai", steps: [{kind: "farm", label: "Kisaan", at: "kisaan"}, {kind: "warehouse", label: "Warehouse", edge: "+12%"}, {kind: "darkstore", label: "Dark store", edge: "+8%"}, {kind: "home", label: "Aap"}]}
+```
+
+**cash** — money in motion. `mode: grow` (stacks pile up) | `burn` (pile on fire, smoke, red counter) | `flow` (coins arc
+`from: {label, kind}` → `to: {label, kind}`, `edge` label, `token: coin|cash`); `value`, `label` (corner counter), `at`.
+```
+@cash {mode: "burn", title: "Cash *burn*", value: "₹1,250 Cr", label: "loss FY24", at: "jal"}
+@cash {mode: "flow", from: {label: "Customer", kind: "phone"}, to: {label: "Zepto", kind: "office"}, edge: "Delivery fee + margin"}
+```
+
+**iso** — free-form world for anything else. `world: {kind: city|suburb|plain, cols, rows, traffic, people}`,
+`place: [{id, model (any node kind), block: [i, j], label, hi, h, color, at}]`, `move: [{model (vehicle), from: id,
+to: id, at: [go, arrive], label, color}]`, `cam: {zoom, follow: 0}`. Blocks: i 0..cols-1, j 0..rows-1.
+```
+@iso {world: {kind: "suburb"}, place: [{id: "k", model: "kirana", block: [1, 1], label: "Kirana"}, {id: "w", model: "warehouse", block: [5, 3], label: "Distributor", hi: true}], move: [{model: "truck", from: "w", to: "k", at: ["truck", "dukaan"], label: "Maal"}], cam: {follow: 0}}
 ```
 
 ## People layout (story beats; paper-cut characters, no host)

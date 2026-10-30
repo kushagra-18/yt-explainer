@@ -149,6 +149,16 @@ HI.update({
 # Roman words that are ALSO everyday English words. Hinglish means Hindi far more often, so these are Hindi unless they sit
 # inside English (English on both sides, numbers count as their other neighbour) or a word rule below says otherwise.
 AMBIG = {"do", "the", "to", "is", "us", "in", "un", "main", "me", "use", "are", "ban", "log", "mile", "door", "sun", "man"}
+def EN_NUM(n):
+    ones = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen".split()
+    tens = "_ _ twenty thirty forty fifty sixty seventy eighty ninety".split()
+    if n < 20:
+        return ones[n]
+    if n < 100:
+        return tens[n // 10] + ("" if n % 10 == 0 else " " + ones[n % 10])
+    return str(n)
+
+
 # short English words Hinglish writers use as-is (too short for the English frequency list)
 EN_SHORT = {"ad", "app", "vs", "ok", "id", "ui", "ux", "ai", "tv", "pc", "hr", "pr", "ca"}
 # "ban" is Hindi बन before these, English "ban" (prohibition) next to the others
@@ -339,6 +349,9 @@ def tokens(text, extra_lex=None, online=True):
         low = core.lower()
         if low in lex:
             t.update(lang="lex", tts=lex[low].split())
+        elif re.match(r"^(FY|H|Q)\d{1,4}$", core, re.I):  # FY24 -> "FY twenty four", Q3 -> "Q three" (how Indian business media says it)
+            m = re.match(r"^([A-Za-z]+)(\d+)$", core)
+            t.update(lang="en", tts=[m.group(1).upper()] + EN_NUM(int(m.group(2)[-2:]) if m.group(1).lower() == "fy" else int(m.group(2))).split())
         elif re.match(r"^[₹$€£]?\d", core):
             parts = re.split(r"(?<=\d)-(?=\d)", core)  # "2-3" -> two numbers with "से"
             out, used = [], False

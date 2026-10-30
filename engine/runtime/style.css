@@ -41,3 +41,23 @@ html,body{margin:0;background:var(--bg,#FBE6EE)}
 .bubble{position:absolute;background:var(--card);border-radius:28px;padding:18px 26px 14px;font:600 34px/1.25 Palanquin;color:var(--ink);box-shadow:0 14px 26px -12px rgba(0,0,0,.35);z-index:8;max-width:520px}
 .bubble:after{content:"";position:absolute;bottom:-22px;left:46px;border:14px solid transparent;border-top:18px solid var(--card)}
 .bubble.r:after{left:auto;right:46px}
+
+/* iso scenes: chips that follow world points, corner counters, order notifications */
+.isolab { white-space: nowrap; font: 600 30px/1 Khand, sans-serif; letter-spacing: .02em; text-transform: uppercase; color: var(--card); background: var(--ink);
+  padding: 9px 16px 7px; border-radius: 10px; box-shadow: 0 8px 18px rgba(19,41,61,.22); display: flex; align-items: center; gap: 8px; margin-top: -14px; }
+.isolab::after { content: ''; position: absolute; left: 50%; bottom: -9px; margin-left: -9px; border: 9px solid transparent; border-bottom: 0; border-top-color: inherit; }
+.isolab { border-top-color: var(--ink); }
+.isolab.ac { background: var(--ac); border-top-color: var(--ac); }
+.isolab.lt { background: var(--card); color: var(--ink); border-top-color: var(--card); }
+.isolab.ok { background: #2F8F83; border-top-color: #2F8F83; }
+.isolab.sm { font-size: 24px; padding: 7px 12px 5px; }
+.isolab small { display: block; font: 500 20px/1.1 Palanquin, sans-serif; text-transform: none; opacity: .85; margin-left: 6px; }
+.isocorner { position: absolute; right: 70px; top: 64px; display: flex; align-items: center; gap: 14px; padding: 16px 26px 12px; border-radius: 16px;
+  background: var(--ink); color: var(--card); box-shadow: 0 14px 30px rgba(19,41,61,.25); transform-origin: 100% 0; }
+.isocorner b { font: 700 74px/0.9 Khand, sans-serif; }
+.isocorner small { font: 600 26px/1 Khand, sans-serif; text-transform: uppercase; opacity: .8; max-width: 260px; }
+.isocorner.bad { background: #E63946; }
+.isonote { position: absolute; width: 420px; display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-radius: 18px; background: var(--card);
+  color: var(--ink); box-shadow: 0 14px 30px rgba(19,41,61,.2); font: 500 24px/1.25 Palanquin, sans-serif; }
+.isonote b { font: 700 28px/1 Khand, sans-serif; text-transform: uppercase; }
+.isonote .dot { flex: none; width: 48px; height: 48px; border-radius: 12px; background: var(--ac); display: flex; align-items: center; justify-content: center; }

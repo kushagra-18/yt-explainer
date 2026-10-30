@@ -39,7 +39,7 @@
     cast.forEach(function (c, i) {
       var id = c.id || c.preset || 'p' + i;
       var x0 = c.x !== undefined ? c.x : (n === 1 ? 960 : 360 + i * (1200 / Math.max(1, n - 1)));
-      var scale = c.scale || (n > 3 ? 1.05 : 1.25);
+      var scale = c.scale || (n > 3 ? 0.85 : p.title ? 0.9 : 1.0); // head stays >= 260 px from the top so bubbles fit
       var look = Object.assign({ preset: c.preset || 'founder' }, c.look || {});
       if (look.preset && !PE.PRESET[look.preset]) look.preset = 'founder';
       var holder = S.add('mid', el('div', 'person-svg', 'left:0;top:0;width:1920px;height:1080px;filter:url(#paperedge)'));
@@ -95,8 +95,8 @@
           var k = lt < b.t ? 0 : lt < b.t + 0.25 ? (lt - b.t) / 0.25 : lt < b.end ? 1 : Math.max(0, 1 - (lt - b.end) / 0.2);
           b.el.style.opacity = k; b.el.style.transform = 'scale(' + (0.7 + 0.3 * k) + ')';
           var right = X > 1100;
-          b.el.style.left = (right ? X - 520 + 40 : X - 70) + 'px';
-          b.el.style.top = (floorY - 640 * scale - 140) + 'px';
+          b.el.style.left = Math.max(30, Math.min(1890 - 520, right ? X - 520 + 40 : X - 70)) + 'px';
+          b.el.style.top = 'auto'; b.el.style.bottom = (1080 - (floorY - 640 * scale - 14)) + 'px'; // sits just above the head
           b.el.style.transformOrigin = right ? '90% 100%' : '10% 100%';
         });
       });

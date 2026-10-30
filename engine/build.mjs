@@ -278,7 +278,7 @@ console.log(`\n${timeline.length} scenes, ${fmt(TOTAL)} total, voice ${voiced}/$
 if (PLAN) process.exit(0);
 
 // ───────── HTML ─────────
-const RT = ['core.js', 'people.js'].map((f) => fs.readFileSync(path.join(ENGINE, 'runtime', f), 'utf8')).join('\n');
+const RT = ['core.js', 'people.js', 'iso.js'].map((f) => fs.readFileSync(path.join(ENGINE, 'runtime', f), 'utf8')).join('\n');
 const LAY = fs.readdirSync(path.join(ENGINE, 'layouts')).filter((f) => f.endsWith('.js')).sort().map((f) => fs.readFileSync(path.join(ENGINE, 'layouts', f), 'utf8')).join('\n');
 const MAP = needMap ? fs.readFileSync(path.join(K, 'assets/data/india.json'), 'utf8') : 'null';
 function html(from, to, offset) {

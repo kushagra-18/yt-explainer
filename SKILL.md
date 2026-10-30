@@ -16,7 +16,7 @@ the video folder, e.g. `cd ~/yt-explainers/videos/<slug> && yt plan`).
 - Hinglish, written in **Roman script**; tone like Think School (curious, story-first, confident, a bit witty, never preachy).
 - Voice: Sarvam `bulbul:v4-flash`, `aryaman_hi_ads`, pace 1.2 (in `assets/brand.json`). Key from `SARVAM_API_KEY`
   (env / .env files) — never print it.
-- Look: Blush & Navy collage + data motion, Khand/Palanquin, duotone photos, paper-cut characters, no host, no
+- Look: Blush & Navy collage + isometric motion scenes + data motion, Khand/Palanquin, duotone photos, paper-cut characters, no host, no
   stick figures, no AI images. `accent:` in front matter = the featured brand's colour.
 - 1920x1080 30 fps, 8-15 min. Deliver MP4 + SRT + upload pack.
 
@@ -36,8 +36,9 @@ the video folder, e.g. `cd ~/yt-explainers/videos/<slug> && yt plan`).
    + mp3s; they reply e.g. `Zepto 1, Kaivalya 3` → `yt names pick Zepto=1 Kaivalya=3` (global lexicon, forever).
 5. **Layouts**: add one `@layout {...}` line above each paragraph (`references/video-format.md` — read it
    every time you write layouts). Rules: a new visual every 6-12 s of speech (split long paragraphs);
-   vary layouts; data appears exactly when it's said (`at:` cues); a pattern interrupt every 20-40 s
-   (people scene, map, headlines, photo, statement on ink). Add the `img:` list for photos/logos.
+   vary layouts; data appears exactly when it's said (`at:` cues). **~50 % of screen time is motion**
+   (ride, cutaway, network, chain, cash, iso, people) — show the business working, charts only when the
+   number is the point (~30 %), text/photo ~20 %. Add the `img:` list for photos/logos.
 6. `yt plan` → fix every error/warning (unknown cue words print the scene's spoken words).
 7. `yt assets` → look at `qa/assets.jpg` (right person? right logo? good crop?). `yt assets --redo <name>`
    for the next search result, or drop the user's own file at `assets/img/<name>.jpg|png` (always wins).

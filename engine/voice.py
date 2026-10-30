@@ -296,7 +296,7 @@ def candidates():
             mid = k > 0 and not re.search(r"[.?!]$", toks[k - 1]["post"] or "")  # capitalised mid-sentence = a name, even "Kite"
             if t["lang"] == "en" and c[:1].isupper() and (c.lower() not in eng or mid) and c.lower() not in lex and not c.isupper():
                 seen.setdefault(c, L["text"])
-            elif t["lang"] == "en" and c.isupper() and 2 <= len(c) <= 6 and c.lower() not in lex:
+            elif t["lang"] == "en" and c.isupper() and 2 <= len(c) <= 6 and c.lower() not in lex and not re.search(r"\d", c):
                 seen.setdefault(c, L["text"])
     return seen
 
@@ -308,6 +308,25 @@ def syllables(w):
     return (s + rest).capitalize()
 
 
+_opts = {}
+
+
+def options(name):
+    """3 spellings to audition: as written, syllabified / spelled out, Devanagari (dropped when transliteration
+    translated instead: Kite -> पतंग). English-looking magic-e names also get a respelling (Kite -> Kait)."""
+    if name in _opts:
+        return _opts[name]
+    o = [name, " ".join(name) if name.isupper() else syllables(name)]
+    deva = H.translit([name])[0]
+    if lev(roman(deva), name.lower()) / max(len(name), 1) <= 0.6:
+        o.append(deva)
+    resp = re.sub(r"([^aeiou])i([^aeiou])e$", r"\1ai\2", name)
+    if resp != name:
+        o.append(resp)
+    _opts[name] = list(dict.fromkeys(o))
+    return _opts[name]
+
+
 def names():
     c = candidates()
     if not c:
@@ -316,8 +335,7 @@ def names():
     out.mkdir(exist_ok=True)
     md = ["# Name check", "", "Listen, then tell Claude the number per name (e.g. `Zepto 1, Kaivalya 3`). Saved forever in the lexicon.", ""]
     for name in c:
-        deva = H.translit([name])[0]
-        opts = [name, syllables(name), deva] if not name.isupper() else [name, " ".join(name), deva]
+        opts = options(name)
         opts = list(dict.fromkeys(opts))
         md.append(f"- **{name}**: " + " · ".join(f"{i}=`{o}`" for i, o in enumerate(opts, 1)))
         for i, o in enumerate(opts, 1):
@@ -329,7 +347,7 @@ def names():
             f.unlink()
         print(f"{name}: " + "  ".join(f"{i}={o}" for i, o in enumerate(opts, 1)), flush=True)
     (out / "NAMES.md").write_text("\n".join(md) + "\n")
-    (out / "options.json").write_text(json.dumps({n: (lambda n: [n, syllables(n) if not n.isupper() else " ".join(n), H.translit([n])[0]])(n) for n in c}, ensure_ascii=False))
+    (out / "options.json").write_text(json.dumps({n: options(n) for n in c}, ensure_ascii=False))
     print(f"\nauditions: {out}  (open it, listen, then: yt names pick Name=N ...)")
 
 
