@@ -1,7 +1,7 @@
 #!/bin/bash
 # yt — YouTube explainer pipeline. Run inside a video folder (~/yt-explainers/videos/<slug>), except `yt new`.
 #
-#   yt new <slug>              scaffold a video folder (video.md template, fonts)
+#   yt new <slug> [genre]      scaffold a video folder (genre: explainer | horror | whatif)
 #   yt plan                    check video.md; print scenes, times and every scene's spoken words (cue vocabulary)
 #   yt build                   check + build index.html
 #   yt tts "line"              show what the voice will receive for a line (Devanagari/Latin split, numbers)
@@ -28,10 +28,11 @@ slug() { basename "$PWD"; }
 
 case "$cmd" in
   new)
-    S="${1:?usage: yt new <slug>}"; P="$VIDEOS/$S"
+    S="${1:?usage: yt new <slug> [explainer|horror|whatif]}"; P="$VIDEOS/$S"
     [ -e "$P" ] && { echo "exists: $P"; exit 1; }
     mkdir -p "$P"/{assets/img,assets/fonts,renders,qa,upload,.yt}
-    cp "$K/examples/template.md" "$P/video.md"
+    G="${2:-explainer}"; T="$K/examples/template-$G.md"; [ -f "$T" ] || T="$K/examples/template.md"
+    cp "$T" "$P/video.md"
     cp "$K"/assets/fonts/*.ttf "$P/assets/fonts/"
     printf 'renders/\nqa/\n.yt/\n_seg*.html\n_range.html\nindex.html\nnames/\n' > "$P/.gitignore"
     cat > "$P/hyperframes.json" <<'JSON'

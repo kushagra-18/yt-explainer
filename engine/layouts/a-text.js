@@ -26,11 +26,11 @@
       var tb = S.at(p.at, S.slot(0, 1, 0.3));
       S.anim(b, 'pop', tb, 0.45); if (K.parseNum(p.big)) { S.anim(b, 'count', tb, 1.1); S.sfx(tb, 'counter', 0.6); }
     }
-    if (p.label) { var lb = el('div', '', 'font:500 40px/1.3 Palanquin;margin-top:10px;max-width:760px;color:' + P.ink, K.rich(p.label)); col.appendChild(lb); S.anim(lb, 'rise', S.at(p.at, S.slot(0, 1, 0.3)) + 0.4, 0.5, { dist: 20 }); }
+    if (p.label) { var lb = el('div', '', 'font:500 40px/1.3 var(--fb);margin-top:10px;max-width:760px;color:' + P.ink, K.rich(p.label)); col.appendChild(lb); S.anim(lb, 'rise', S.at(p.at, S.slot(0, 1, 0.3)) + 0.4, 0.5, { dist: 20 }); }
     if (p.clip) {
       var tc = S.at(p.clip.at, S.slot(0, 1, 0.65));
       var cl = S.add('fg', K.card('left:' + (left ? 1300 : 160) + 'px;top:790px;width:520px;padding:24px 30px;transform:rotate(-3deg)',
-        '<div style="font:700 22px/1 Palanquin;letter-spacing:.12em;color:' + P.accent + ';text-transform:uppercase">' + K.esc(p.clip.source || '') + '</div>' +
+        '<div style="font:700 22px/1 var(--fb);letter-spacing:.12em;color:' + P.accent + ';text-transform:var(--up)">' + K.esc(p.clip.source || '') + '</div>' +
         '<div class="k" style="font-size:46px;line-height:1.02;color:#1a1a1a;margin-top:10px">' + K.rich(p.clip.text || '') + '</div>' +
         '<div style="height:10px;background:#0002;margin-top:16px;width:90%"></div><div style="height:10px;background:#0002;margin-top:10px;width:66%"></div>'));
       S.anim(cl, 'drop', tc, 0.5); S.sfx(tc, 'flip', 0.7);
@@ -42,8 +42,8 @@
   // STATEMENT: one big idea in type, optional icon or photo; bg: paper | ink | accent
   L('statement', function (S, p, P) {
     var bg = p.bg || 'paper';
-    var fg = bg === 'paper' ? P.ink : bg === 'yellow' ? P.ink : P.card;
-    if (bg !== 'paper') S.el.style.background = bg === 'ink' ? P.ink : bg === 'yellow' ? P.yellow : P.accent;
+    var fg = bg === 'paper' ? P.ink : bg === 'yellow' ? P.ink : P.onDeep;
+    if (bg !== 'paper') S.el.style.background = bg === 'ink' || bg === 'black' ? P.deep : bg === 'yellow' ? P.yellow : P.accent;
     var side = p.icon || p.img;
     var cx = side ? 120 : 160, w = side ? 1060 : 1600;
     var box = S.add('mid', el('div', '', 'position:absolute;left:' + cx + 'px;top:0;height:1080px;width:' + w + 'px;display:flex;flex-direction:column;justify-content:center;' + (p.align === 'center' && !side ? 'align-items:center;text-align:center;' : '')));
@@ -53,10 +53,10 @@
     var lines = text.split(/\s*\|\s*/); // "|" forces a line break and reveals line by line
     lines.forEach(function (ln, i) {
       var d = el('div', 'k', 'font-size:' + size + 'px;line-height:.95;color:' + fg + (bg !== 'paper' ? ';--y:' + (bg === 'ink' ? P.accent : P.ink) : ''), K.rich(ln, bg === 'accent' ? 'mk' : 'mk'));
-      box.appendChild(d);
-      S.anim(d, 'wipe', S.at(p.at && p.at[i], 0.15 + i * Math.max(0.35, (S.speech[1] - S.speech[0]) * 0.5 / lines.length)), 0.55);
+      box.appendChild(d); S.fit(d, w);
+      S.anim(d, window.GENRE === 'horror' ? 'fade' : 'wipe', S.at(p.at && p.at[i], 0.15 + i * Math.max(0.35, (S.speech[1] - S.speech[0]) * 0.5 / lines.length)), 0.55);
     });
-    if (p.sub) { var s = el('div', '', 'font:500 40px/1.35 Palanquin;margin-top:26px;max-width:1000px;color:' + fg + ';opacity:.85', K.rich(p.sub)); box.appendChild(s); S.anim(s, 'rise', 0.6, 0.5, { dist: 24 }); }
+    if (p.sub) { var s = el('div', '', 'font:500 40px/1.35 var(--fb);margin-top:26px;max-width:1000px;color:' + fg + ';opacity:.85', K.rich(p.sub)); box.appendChild(s); S.anim(s, 'rise', 0.6, 0.5, { dist: 24 }); }
     if (p.icon) {
       K.blob(S, 1500, 540, 300, bg === 'paper' ? P.yellow : bg === 'ink' ? P.accent : P.ink);
       var ic = S.add('mid', el('div', '', 'position:absolute;left:1300px;top:340px;width:400px;height:400px;color:' + (bg === 'paper' ? P.ink : P.card), K.icon(p.icon, null, 400)));
@@ -73,26 +73,29 @@
 
   // TITLE sting (auto, between hook and chapter 1)
   L('title', function (S, p, P) {
-    S.el.style.background = P.ink;
+    S.el.style.background = P.deep;
     K.blob(S, 1580, 220, 380, P.accent); K.blob(S, 260, 980, 300, P.yellow);
-    var t = S.add('mid', el('div', '', 'position:absolute;left:150px;top:0;height:1080px;width:1500px;display:flex;align-items:center', '<div class="k" style="font-size:' + (p.title.length > 40 ? 120 : 150) + 'px;color:' + P.card + '">' + K.rich(p.title) + '</div>'));
-    S.anim(t, 'stamp', 0.1, 0.45, { rot: -3 });
-    if (p.channel) { var c = S.add('mid', K.chip(p.channel, P.yellow, P.ink, 'position:absolute;left:150px;top:180px;transform:rotate(-2deg)')); S.anim(c, 'drop', 0.35, 0.4); }
-    S.sfx(0.1, 'riser', 0.6); S.sfx(0.45, 'thud', 0.8);
+    var hor = window.GENRE === 'horror';
+    var t = S.add('mid', el('div', '', 'position:absolute;left:150px;top:0;height:1080px;width:1620px;display:flex;align-items:center' + (hor ? ';justify-content:center;text-align:center;left:150px' : ''), '<div class="k" style="font-size:' + (p.title.length > 40 ? 120 : 150) + 'px;color:' + P.onDeep + '">' + K.rich(p.title) + '</div>'));
+    S.fit(t.firstChild, 1620, 900);
+    if (hor) { S.anim(t, 'fade', 0.15, 1.1); S.tw(0.15, 1.4, function (k) { t.style.opacity = k < 1 ? (Math.sin(k * 40) > -0.2 ? k : k * 0.3) : 1; }); S.sfx(0.1, 'boom', 0.9); }
+    else { S.anim(t, 'stamp', 0.1, 0.45, { rot: -3 }); S.sfx(0.1, 'riser', 0.6); S.sfx(0.45, 'thud', 0.8); }
+    if (p.channel) { var c = S.add('mid', K.chip(p.channel, P.yellow, P.ink, 'position:absolute;left:150px;top:180px')); S.anim(c, 'fade', 0.35, 0.4); }
     S.cam = 'in';
   });
 
   // CHAPTER card (auto from "# Heading")
   L('chapter', function (S, p, P) {
-    S.el.style.background = P.ink;
-    var n = S.add('bg', el('div', 'k', 'position:absolute;right:-30px;top:-120px;font-size:900px;line-height:1;color:transparent;-webkit-text-stroke:6px ' + P.accent + ';opacity:.9', String(p.n).padStart(2, '0')));
+    S.el.style.background = P.deep;
+    var n = S.add('bg', el('div', 'k', 'position:absolute;right:110px;top:150px;font-size:780px;line-height:.85;color:transparent;-webkit-text-stroke:5px ' + P.accent + ';opacity:.85', String(p.n).padStart(2, '0')));
     S.anim(n, 'right', 0, 0.8, { dist: 300 });
-    var lab = S.add('mid', K.chip('Chapter ' + p.n, P.yellow, P.ink, 'position:absolute;left:150px;top:330px;font-size:40px;transform:rotate(-2deg)'));
-    S.anim(lab, 'stamp', 0.2, 0.35, { rot: -2 });
-    var t = S.add('mid', el('div', 'k', 'position:absolute;left:150px;top:420px;width:1200px;font-size:' + (p.title.length > 28 ? 120 : 150) + 'px;color:' + P.card, K.rich(p.title)));
-    S.anim(t, 'wipe', 0.4, 0.6);
-    S.add('fg', K.tape('left:140px;top:300px;transform:rotate(-8deg);width:120px'));
-    S.sfx(0.2, 'stamp', 0.9);
+    if (window.GENRE === 'horror') n.style.webkitTextStroke = '3px ' + P.accent, n.style.opacity = '.35';
+    var lab = S.add('mid', K.chip((window.GENRE === 'explainer' ? 'Chapter ' : 'Bhaag ') + p.n, P.yellow, window.GENRE === 'horror' ? P.ink : P.ink, 'position:absolute;left:150px;top:330px;font-size:40px'));
+    S.anim(lab, 'fade', 0.2, 0.35);
+    var t = S.add('mid', el('div', 'k', 'position:absolute;left:150px;top:420px;width:1300px;font-size:' + (p.title.length > 28 ? 120 : 150) + 'px;color:' + P.onDeep, K.rich(p.title)));
+    S.fit(t, 1300, 520);
+    S.anim(t, window.GENRE === 'horror' ? 'fade' : 'wipe', 0.4, window.GENRE === 'horror' ? 1 : 0.6);
+    S.sfx(0.2, window.GENRE === 'horror' ? 'boom' : 'stamp', 0.9);
     S.cam = 'out';
   });
 
@@ -102,9 +105,9 @@
     if (p.img) { var im = S.add('mid', K.image(p.img, { css: 'position:absolute;left:1160px;bottom:-30px;width:700px;height:960px', fit: 'contain', pos: 'bottom', sticker: true })); S.anim(im, 'rise', 0.1, 0.6, { dist: 100 }); S.float(im, 3, 0.8, 5); }
     var q = S.add('mid', el('div', 'k', 'position:absolute;left:110px;top:90px;font-size:420px;line-height:1;color:' + P.accent, '“'));
     S.anim(q, 'pop', 0.05, 0.5);
-    var tx = S.add('mid', el('div', '', 'position:absolute;left:170px;top:300px;width:' + (p.img ? 1000 : 1500) + 'px;font:600 ' + (String(p.text).length > 120 ? 62 : 76) + 'px/1.2 Palanquin;color:' + P.ink, K.rich(p.text)));
+    var tx = S.add('mid', el('div', '', 'position:absolute;left:170px;top:300px;width:' + (p.img ? 1000 : 1500) + 'px;font:600 ' + (String(p.text).length > 120 ? 62 : 76) + 'px/1.2 var(--fb);color:' + P.ink, K.rich(p.text)));
     S.anim(tx, 'wipeup', 0.3, 0.9);
-    if (p.who) { var w = S.add('mid', el('div', '', 'position:absolute;left:170px;bottom:150px', '<div class="k" style="font-size:64px;color:' + P.ink + '">— ' + K.esc(p.who) + '</div>' + (p.role ? '<div style="font:500 32px/1.3 Palanquin;color:' + P.ink + ';opacity:.8;margin-left:44px">' + K.esc(p.role) + '</div>' : ''))); S.anim(w, 'left', 0.9, 0.5); }
+    if (p.who) { var w = S.add('mid', el('div', '', 'position:absolute;left:170px;bottom:150px', '<div class="k" style="font-size:64px;color:' + P.ink + '">— ' + K.esc(p.who) + '</div>' + (p.role ? '<div style="font:500 32px/1.3 var(--fb);color:' + P.ink + ';opacity:.8;margin-left:44px">' + K.esc(p.role) + '</div>' : ''))); S.anim(w, 'left', 0.9, 0.5); }
     S.popZone = { x: 170, y: 120, w: 600 };
   });
 
@@ -127,12 +130,12 @@
 
   // END screen: 20 s with slots for YouTube end-screen elements (two videos left/right, subscribe centre)
   L('end', function (S, p, P) {
-    S.el.style.background = P.ink;
+    S.el.style.background = P.deep;
     K.blob(S, 960, 1150, 520, P.accent);
-    var h = S.add('mid', el('div', 'k', 'position:absolute;left:0;width:1920px;top:80px;text-align:center;font-size:110px;color:' + P.card, K.rich(p.title || 'Agla case study *yahan* hai')));
+    var h = S.add('mid', el('div', 'k', 'position:absolute;left:0;width:1920px;top:80px;text-align:center;font-size:110px;color:' + P.onDeep, K.rich(p.title || { explainer: 'Agla case study *yahan* hai', horror: 'Agli kahani *yahan* hai', whatif: 'Agla sawaal *yahan* hai' }[window.GENRE] || 'Agla video *yahan* hai')));
     S.anim(h, 'wipe', 0.2, 0.6);
     [[150, 300], [1010, 300]].forEach(function (xy, i) {
-      var b = S.add('mid', el('div', '', 'position:absolute;left:' + xy[0] + 'px;top:' + xy[1] + 'px;width:760px;height:428px;border:6px dashed rgba(255,248,242,.5);border-radius:18px;display:flex;align-items:center;justify-content:center;color:rgba(255,248,242,.6);font:600 32px Palanquin', K.icon('play-circle', 'rgba(255,248,242,.6)', 90)));
+      var b = S.add('mid', el('div', '', 'position:absolute;left:' + xy[0] + 'px;top:' + xy[1] + 'px;width:760px;height:428px;border:6px dashed rgba(255,248,242,.5);border-radius:18px;display:flex;align-items:center;justify-content:center;color:rgba(255,248,242,.6);font:600 32px var(--fb)', K.icon('play-circle', 'rgba(255,248,242,.6)', 90)));
       S.anim(b, 'pop', 0.4 + i * 0.15, 0.5);
     });
     var sub = S.add('mid', el('div', '', 'position:absolute;left:840px;top:800px;width:240px;height:240px;border-radius:50%;border:6px dashed rgba(255,248,242,.55)'));

@@ -74,7 +74,10 @@ let md = fs.readFileSync(mdPath, 'utf8').replace(/\r/g, '');
 let meta = {};
 const fm = md.match(/^---\n([\s\S]*?)\n---\n/);
 if (fm) { meta = yaml(fm[1]); md = md.slice(fm[0].length); }
-const P = Object.assign({}, BRAND.palette, meta.accent ? { accent: meta.accent } : {});
+const GENRE = meta.genre || 'explainer';
+if (!BRAND.genres[GENRE]) { console.error(`genre "${GENRE}" unknown. Genres: ${Object.keys(BRAND.genres).join(', ')}`); process.exit(1); }
+const THEME = BRAND.genres[GENRE];
+const P = Object.assign({}, BRAND.palette, THEME.palette, meta.accent ? { accent: meta.accent } : {});
 
 const scenes = []; const chapters = [];
 let chapter = null, pending = null, lineNo = 0;
@@ -97,7 +100,8 @@ for (let i = 0; i < src.length; i++) {
     while (body && bal(body) > 0 && i + 1 < src.length) body += '\n' + src[++i];
     let params = {};
     try { params = body.trim() ? obj(body.trim()) : {}; } catch (e) { err(`line ${i + 1} @${m[1]}: ${e.message}`); }
-    if (!LAYOUTS[m[1]]) err(`line ${i + 1}: unknown layout "@${m[1]}". Layouts: ${Object.keys(LAYOUTS).join(', ')}`);
+    const GONE = { cutaway: '@scene {set: "store"|"office", cast, labels, cards}', network: '@map (cities) or @scene', chain: '@flow or a @ride per leg', iso: '@scene' };
+    if (!LAYOUTS[m[1]]) { err(`line ${i + 1}: unknown layout "@${m[1]}".` + (GONE[m[1]] ? ` The isometric layouts were removed (2D only now) — use ${GONE[m[1]]}.` : ` Layouts: ${Object.keys(LAYOUTS).join(', ')}`)); continue; }
     pending = { layout: m[1], params, srcLine: i + 1 };
     continue;
   }
@@ -116,6 +120,7 @@ for (let i = 0; i < src.length; i++) {
   scenes[scenes.length - 1].lines.push({ id: ++lineNo, text });
 }
 if (pending) err(`@${pending.layout} at line ${pending.srcLine} has no narration paragraph under it`);
+if (errors.length) { console.log('ERRORS (fix video.md):\n  ' + [...new Set(errors)].join('\n  ')); process.exit(1); }
 
 // ───────── voice timings ─────────
 const CACHE = process.env.YT_CACHE || path.join(process.env.HOME, 'yt-explainers', '.cache');
@@ -212,7 +217,7 @@ for (const s of timeline) {
   s.p = resolve(s, s.params || {});
   const L = LAYOUTS[s.layout];
   for (const r of L.required || []) if (s.p[r] === undefined) err(`scene @${s.layout} (line ${s.srcLine}): needs "${r}". ${L.doc}`);
-  for (const k of Object.keys(s.p)) if (!L.params.includes(k) && !['min', 'trans', 'src', 'lower', 'cam', 'bg'].includes(k)) warn(`scene @${s.layout} (line ${s.srcLine}): unknown param "${k}" (known: ${L.params.join(', ')})`);
+  for (const k of Object.keys(s.p)) if (!L.params.includes(k) && !['min', 'trans', 'src', 'lower', 'cam', 'bg', 'stamp', 'pops'].includes(k)) warn(`scene @${s.layout} (line ${s.srcLine}): unknown param "${k}" (known: ${L.params.join(', ')})`);
   s.speech = s.words.length ? [s.words[0].t, s.words[s.words.length - 1].e] : [0.2, s.dur - 0.3];
 }
 
@@ -269,22 +274,33 @@ if (PLAN || !RANGE) {
     console.log(`${head} L${s.srcLine}` + (PLAN ? `\n      ${s.words.map((w) => w.w).join(' ')}` : ''));
   }
 }
+// chart budget (user decision, Nov 2026: too many graphs read as a slideshow). Data scenes = charts/number cards.
+const DATA = new Set(['bars', 'hbars', 'line', 'donut', 'units', 'stat', 'compare']);
+const BUDGET = { explainer: 0.15, whatif: 0.1, horror: 0 }[GENRE] ?? 0.15;
+const story = timeline.filter((s) => !s.auto);
+const storyT = story.reduce((a, s) => a + s.dur, 0) || 1;
+const dataT = story.filter((s) => DATA.has(s.layout)).reduce((a, s) => a + s.dur, 0);
+if (dataT / storyT > BUDGET + 1e-9) warn(`charts/number cards are ${Math.round(dataT / storyT * 100)}% of screen time (budget for ${GENRE}: ${Math.round(BUDGET * 100)}%). Keep only the numbers that ARE the point; show the rest with @scene / @ride / @cash / @photo.`);
+for (let i = 1; i < story.length; i++) if (DATA.has(story[i].layout) && DATA.has(story[i - 1].layout)) err(`two data scenes in a row (lines ${story[i - 1].srcLine}, ${story[i].srcLine}): put a story scene between them or merge them`);
+for (let i = 1; i < story.length; i++) if (story[i].layout === story[i - 1].layout && !['scene', 'people'].includes(story[i].layout)) warn(`same layout twice in a row: @${story[i].layout} (lines ${story[i - 1].srcLine}, ${story[i].srcLine})`);
+const sceneShare = story.filter((s) => ['scene', 'people', 'ride', 'cash'].includes(s.layout)).reduce((a, s) => a + s.dur, 0) / storyT;
 const long = timeline.filter((s) => !s.auto && s.dur > 16);
 if (long.length) warn(`${long.length} scene(s) longer than 16 s (pattern interrupt every ~8-15 s): lines ${long.map((s) => s.srcLine).join(', ')} — split the paragraph or add another @layout`);
 
 if (warns.length) console.log('\nwarnings:\n  ' + [...new Set(warns)].join('\n  '));
 if (errors.length) { console.log('\nERRORS (fix video.md):\n  ' + [...new Set(errors)].join('\n  ')); process.exit(1); }
-console.log(`\n${timeline.length} scenes, ${fmt(TOTAL)} total, voice ${voiced}/${lines.length} lines${voiced < lines.length ? ' (rest estimated: run yt voice)' : ''}`);
+console.log(`\ngenre ${GENRE} · story scenes ${Math.round(sceneShare * 100)}% · charts ${Math.round(dataT / storyT * 100)}% (max ${Math.round(BUDGET * 100)}%)`);
+console.log(`${timeline.length} scenes, ${fmt(TOTAL)} total, voice ${voiced}/${lines.length} lines${voiced < lines.length ? ' (rest estimated: run yt voice)' : ''}`);
 if (PLAN) process.exit(0);
 
 // ───────── HTML ─────────
-const RT = ['core.js', 'people.js', 'iso.js'].map((f) => fs.readFileSync(path.join(ENGINE, 'runtime', f), 'utf8')).join('\n');
+const RT = ['core.js', 'people.js', 'sets.js'].map((f) => fs.readFileSync(path.join(ENGINE, 'runtime', f), 'utf8')).join('\n');
 const LAY = fs.readdirSync(path.join(ENGINE, 'layouts')).filter((f) => f.endsWith('.js')).sort().map((f) => fs.readFileSync(path.join(ENGINE, 'layouts', f), 'utf8')).join('\n');
 const MAP = needMap ? fs.readFileSync(path.join(K, 'assets/data/india.json'), 'utf8') : 'null';
 function html(from, to, offset) {
   const sel = timeline.filter((s) => s.start < to + TRANS && s.start + s.dur > from - TRANS); // neighbours too: transitions straddle cuts
   const data = {
-    W: BRAND.video.width, H: BRAND.video.height, P, fonts: BRAND.fonts, total: to - from, offset,
+    W: BRAND.video.width, H: BRAND.video.height, P, genre: GENRE, theme: THEME, total: to - from, offset,
     nudge: nudge !== null && nudge >= from && nudge < to ? nudge : null, title: meta.title || '', channel: meta.channel || BRAND.channel.name || '',
     scenes: sel.map((s) => ({ layout: s.layout, start: +(s.start).toFixed(3), dur: +s.dur.toFixed(3), p: s.p, pops: s.pops, words: s.words.map((w) => [w.w, w.t, w.e]), speech: s.speech, i: timeline.indexOf(s) })),
   };
@@ -298,6 +314,8 @@ function html(from, to, offset) {
 <style>
 ${['Khand-Medium:500', 'Khand-SemiBold:600', 'Khand-Bold:700'].map((f) => `@font-face{font-family:'Khand';src:url('assets/fonts/${f.split(':')[0]}.ttf');font-weight:${f.split(':')[1]}}`).join('\n')}
 ${['Palanquin-Regular:400', 'Palanquin-Medium:500', 'Palanquin-SemiBold:600', 'Palanquin-Bold:700'].map((f) => `@font-face{font-family:'Palanquin';src:url('assets/fonts/${f.split(':')[0]}.ttf');font-weight:${f.split(':')[1]}}`).join('\n')}
+@font-face{font-family:'Crimson Pro';src:url('assets/fonts/CrimsonPro-VF.ttf');font-weight:200 900}
+@font-face{font-family:'Special Elite';src:url('assets/fonts/SpecialElite-Regular.ttf');font-weight:400}
 ${fs.readFileSync(path.join(ENGINE, 'runtime', 'style.css'), 'utf8')}
 </style>
 </head>
@@ -320,7 +338,7 @@ ${LAY}
     Engine.render(0);
   }
   var imgs = Array.prototype.slice.call(document.images);
-  Promise.all(["700 60px Khand", "600 60px Khand", "500 40px Palanquin", "600 40px Palanquin", "700 40px Palanquin"].map(function (f) { return document.fonts.load(f).catch(function () {}); }))
+  Promise.all(["700 60px Khand", "600 60px Khand", "500 40px Palanquin", "600 40px Palanquin", "700 40px Palanquin", "600 60px 'Crimson Pro'", "700 60px 'Crimson Pro'", "400 40px 'Special Elite'"].map(function (f) { return document.fonts.load(f).catch(function () {}); }))
     .then(function () { return document.fonts.ready; }).then(go);
 })();
 </script>

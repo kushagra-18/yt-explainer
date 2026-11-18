@@ -48,7 +48,7 @@
       var box = S.add('mid', el('div', '', 'position:absolute;left:1080px;top:' + (p.title ? 420 : 360) + 'px;width:760px'));
       var bg = el('div', 'big', 'font-size:220px', K.esc(p.count.value)); box.appendChild(bg);
       S.anim(bg, 'pop', t2, 0.4); if (K.parseNum(p.count.value)) S.anim(bg, 'count', t2, 1.4);
-      if (p.count.label) { var cl = el('div', '', 'font:600 44px/1.3 Palanquin;color:' + P.ink, K.rich(p.count.label)); box.appendChild(cl); S.anim(cl, 'rise', t2 + 0.4, 0.5); }
+      if (p.count.label) { var cl = el('div', '', 'font:600 44px/1.3 var(--fb);color:' + P.ink, K.rich(p.count.label)); box.appendChild(cl); S.anim(cl, 'rise', t2 + 0.4, 0.5); }
     }
     S.popZone = { x: 1100, y: 860, w: 700 };
   });
@@ -67,7 +67,7 @@
       track.appendChild(dot); S.anim(dot, 'pop', t, 0.35);
       var yr = el('div', 'k', 'position:absolute;left:' + (x - 130) + 'px;width:300px;text-align:center;top:' + (up ? y - 150 : y + 60) + 'px;font-size:92px;color:' + (it.hi ? P.accent : P.ink), K.esc(it.year));
       track.appendChild(yr); S.anim(yr, up ? 'rise' : 'drop', t + 0.05, 0.45, { dist: 40, rot: 0 });
-      var card = el('div', 'card', 'left:' + (x - 180) + 'px;width:' + Math.min(step - 20, 400) + 'px;top:' + (up ? y + 70 : y - 350) + 'px;padding:22px 24px 18px;font:600 36px/1.22 Palanquin;color:' + P.ink + ';transform:rotate(' + (up ? -1.5 : 1.5) + 'deg)',
+      var card = el('div', 'card', 'left:' + (x - 180) + 'px;width:' + Math.min(step - 20, 400) + 'px;top:' + (up ? y + 70 : y - 350) + 'px;padding:22px 24px 18px;font:600 36px/1.22 var(--fb);color:' + P.ink + ';transform:rotate(' + (up ? -1.5 : 1.5) + 'deg)',
         (it.img ? '' : it.icon ? '<div style="margin-bottom:10px">' + K.icon(it.icon, P.accent, 54) + '</div>' : '') + K.rich(it.text || ''));
       if (it.img) { var im = K.image(it.img, { css: 'width:100%;height:150px;margin-bottom:12px' }); card.insertBefore(im, card.firstChild); }
       track.appendChild(card); S.anim(card, up ? 'rise' : 'drop', t + 0.15, 0.45, { dist: 50, rot: 0 }); S.sfx(t, 'pop', 0.5);
@@ -125,7 +125,7 @@
     items.slice(0, 4).forEach(function (it, i) {
       var t = S.at(it.at, S.slot(i, Math.min(4, items.length), 0.05, 0.7)), s = spots[i];
       var c = S.add('mid', K.card('left:' + s[0] + 'px;top:' + s[1] + 'px;width:700px;padding:30px 36px 26px;transform:rotate(' + s[2] + 'deg);background:#FBF7EE;z-index:' + (i + 1),
-        '<div style="display:flex;justify-content:space-between;border-bottom:3px double #1a1a1a;padding-bottom:10px;margin-bottom:14px"><span style="font:700 26px/1 Palanquin;letter-spacing:.1em;color:' + P.accent + ';text-transform:uppercase">' + K.esc(it.source || '') + '</span><span style="font:500 22px/1 Palanquin;color:#555">' + K.esc(it.date || '') + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;border-bottom:3px double #1a1a1a;padding-bottom:10px;margin-bottom:14px"><span style="font:700 26px/1 var(--fb);letter-spacing:.1em;color:' + P.accent + ';text-transform:var(--up)">' + K.esc(it.source || '') + '</span><span style="font:500 22px/1 var(--fb);color:#555">' + K.esc(it.date || '') + '</span></div>' +
         '<div class="k" style="font-size:' + ((it.text || '').length > 60 ? 52 : 64) + 'px;line-height:1;color:#1a1a1a">' + K.rich(it.text || '') + '</div>' +
         '<div style="margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:10px"><div style="height:9px;background:#0002"></div><div style="height:9px;background:#0002"></div><div style="height:9px;background:#0002;width:80%"></div><div style="height:9px;background:#0002;width:60%"></div></div>'));
       S.anim(c, 'drop', t, 0.5, { rot: s[2] * 3, dist: 200 }); S.sfx(t, 'flip', 0.8);
@@ -167,7 +167,7 @@
       if (s.img) disc.appendChild(K.image(s.img, { css: 'width:100%;height:100%', fit: s.img.cut ? 'contain' : 'cover' })); else disc.innerHTML = K.icon(s.icon || 'circle', '#fff', 120);
       node.appendChild(disc);
       node.appendChild(el('div', 'k', 'font-size:56px;color:' + P.ink + ';margin-top:22px;width:320px', K.rich(s.label)));
-      if (s.sub) node.appendChild(el('div', '', 'font:500 28px/1.25 Palanquin;color:' + P.ink + ';opacity:.8;width:300px', K.rich(s.sub)));
+      if (s.sub) node.appendChild(el('div', '', 'font:500 28px/1.25 var(--fb);color:' + P.ink + ';opacity:.8;width:300px', K.rich(s.sub)));
       S.anim(node, 'pop', times[i], 0.45); S.sfx(times[i], 'pop', 0.55);
     });
     if (n > 1) { // token loops along the chain once everything is visible
@@ -195,14 +195,14 @@
     (p.cards || []).forEach(function (c, i) {
       var t = S.at(c.at, S.slot(i, p.cards.length, 0.1, 0.7));
       var cd = el('div', '', 'position:absolute;left:18px;right:18px;top:' + (80 + i * 150) + 'px;background:#fff;border-radius:22px;padding:18px 18px 14px;display:flex;gap:14px;align-items:flex-start;box-shadow:0 8px 20px -8px rgba(0,0,0,.3)',
-        '<div style="flex:none;width:56px;height:56px;border-radius:14px;background:' + (c.color || P.accent) + ';display:flex;align-items:center;justify-content:center">' + K.icon(c.icon || 'bell-ringing', '#fff', 32) + '</div><div><div style="font:700 24px/1.1 Palanquin;color:#111">' + K.esc(c.title || '') + '</div><div style="font:500 22px/1.25 Palanquin;color:#333;margin-top:4px">' + K.rich(c.text || '') + '</div></div>');
+        '<div style="flex:none;width:56px;height:56px;border-radius:14px;background:' + (c.color || P.accent) + ';display:flex;align-items:center;justify-content:center">' + K.icon(c.icon || 'bell-ringing', '#fff', 32) + '</div><div><div style="font:700 24px/1.1 var(--fb);color:#111">' + K.esc(c.title || '') + '</div><div style="font:500 22px/1.25 var(--fb);color:#333;margin-top:4px">' + K.rich(c.text || '') + '</div></div>');
       scr.appendChild(cd); S.anim(cd, 'drop', t, 0.4, { dist: 60, rot: 0 }); S.sfx(t, 'ding', 0.35);
     });
     var col = S.add('mid', el('div', '', 'position:absolute;left:' + (right ? 140 : 820) + 'px;top:150px;width:900px'));
     if (p.title) { var h = el('div', 'k', 'font-size:110px;color:' + P.ink, K.rich(p.title)); col.appendChild(h); S.anim(h, 'wipe', 0.2, 0.55); }
     (p.points || []).forEach(function (pt, i) {
       var t = S.at(pt.at, S.slot(i, p.points.length, 0.2, 0.8));
-      var r = el('div', '', 'display:flex;gap:20px;align-items:center;margin-top:34px', '<div style="flex:none;width:58px;height:58px;border-radius:50%;background:' + P.accent + ';display:flex;align-items:center;justify-content:center">' + K.icon('check-circle', '#fff', 36) + '</div><div style="font:600 42px/1.25 Palanquin;color:' + P.ink + '">' + K.rich(pt.text || pt) + '</div>');
+      var r = el('div', '', 'display:flex;gap:20px;align-items:center;margin-top:34px', '<div style="flex:none;width:58px;height:58px;border-radius:50%;background:' + P.accent + ';display:flex;align-items:center;justify-content:center">' + K.icon('check-circle', '#fff', 36) + '</div><div style="font:600 42px/1.25 var(--fb);color:' + P.ink + '">' + K.rich(pt.text || pt) + '</div>');
       col.appendChild(r); S.anim(r, 'left', t, 0.45, { dist: 60 });
     });
     S.popZone = right ? { x: 140, y: 860, w: 700 } : { x: 1300, y: 860, w: 520 };

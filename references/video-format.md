@@ -3,6 +3,7 @@
 ## File shape
 ```
 ---
+genre: explainer             # explainer | horror | whatif — palette, fonts, transitions, music, defaults
 title: "Zerodha ne *zero ads* se ₹4,700 Cr kaise kamaye?"   # on the title sting; *x* = accent
 titles: ["Zerodha: zero ads, ₹4,700 Cr profit", "..."]      # upload title options (<= 60 chars)
 brand: Zerodha
@@ -51,19 +52,24 @@ scene start. Prefixes of ≥4 letters match (`"custom"` hits "customers"). Array
 Unknown word → `yt plan` prints the scene's spoken words. Without `at`, items stagger automatically.
 
 ## Params every layout accepts
-`min: 6` minimum scene seconds · `trans: push|drop|zoom|wipe|whip|paper|cut` transition INTO this scene
-(auto-rotated otherwise; chapters use paper) · `cam: in|out|left|right|up|still` slow camera (default in) ·
-`src: "Tofler, FY24"` small source tag (use on every data scene) · `lower: {name, role, at}` lower third.
+`min: 6` minimum scene seconds · `trans: cut|push|whip|zoom|fade|dip|wipe|drop|paper` transition INTO this scene
+(the genre picks a default rotation: explainer mostly cut/push/whip, horror fade/dip/cut, whatif cut/fade/zoom) ·
+`cam: in|out|left|right|up|still|creep` slow camera · `src: "Tofler, FY24"` source tag (every data scene) ·
+`lower: {name, role, at}` lower third · `stamp: {place, time, date, at, hold}` typewriter place/time card
+(stories: "NH-48, Rajasthan / Raat 2:14 baje") · `pops: false` no keyword pops in this scene.
 
-## Pacing rules (user decision: ~50 % motion, 30 % data, 20 % text/photo)
-- 6-12 s per scene (≈ 15-30 words). Longer → split the paragraph and give it a second layout. Motion scenes
-  (ride, cutaway, network, chain, cash, iso, people) may run 10-16 s — they carry the story.
-- **Show, don't chart**: whenever the narration describes something happening (a delivery, a store working,
-  expansion, money burning, goods moving, a founder deciding), use a motion scene. Charts only when the
-  number itself is the point. Never more than 2 data scenes in a row.
-- Never the same layout twice in a row; a pattern interrupt every 20-40 s.
-- Chapter openers: statement or photo; chapter closers: an open loop line on a statement.
+## Pacing rules (user decisions, Nov 2026)
+- **Show, don't chart.** `yt plan` reports the share of screen time per kind. Charts/number cards
+  (bars hbars line donut units stat compare) are capped: explainer ≤ 15 %, whatif ≤ 10 %, horror 0.
+  Two data scenes in a row is an error. Use a chart only when the number itself is the point; everything
+  that *happens* (a delivery, a store working, money burning, a person deciding, a night on the highway)
+  is a `@scene` / `@ride` / `@cash`.
+- Story scenes (`@scene`, `@ride`, `@cash`) should carry most of the video: explainer ≥ 45 %, stories ≥ 70 %.
+- 6-12 s per scene (≈ 15-30 words); story scenes may run 10-16 s. Longer → split the paragraph.
+- Never the same layout twice in a row (except @scene → @scene with a different set/shot).
+- Chapter openers: a wide establishing @scene (or statement); closers: an open-loop line on a statement.
 - Brand colours for brands (`color:` in data rows), accent for the brand the video is about.
+- No 3D / isometric anything. Everything is flat 2D.
 
 ---
 
@@ -177,65 +183,70 @@ Unknown word → `yt plan` prints the scene's spoken words. Without `at`, items 
 @phone {title: "Kite app", cards: [{title: "Kite", text: "Order executed: 10 shares", icon: "check-circle", color: "#387ED1"}], points: ["Simple design", "Zero ads"]}
 ```
 
-## Motion scenes (isometric world — the default way to SHOW the business)
-Colourful isometric city/buildings/vehicles/people; everything moves (traffic, walkers, workers). Brand colour = `accent`.
-Node kinds everywhere: darkstore, shop, kirana, restaurant, warehouse, factory, farm, home, tower, office, bank, phone.
-Vehicles: scooter, bike, car, auto, van, truck, bus.
+## Story scenes (flat 2D sets — the default way to SHOW anything)
+Illustrated sets drawn in layers with real depth (far layers fade into the time-of-day haze), lit windows,
+street lamps with light cones, swaying trees, a ceiling fan that spins, tube lights that flicker. The camera
+moves through the layers (parallax). A cast of code-drawn characters acts on top.
 
-**ride** — a vehicle crosses the city A → B, camera follows, route draws, timer counts, "Delivered" stamp.
-`vehicle`, `from: {label, kind, icon}`, `to: {label, kind, icon}`, `at: [depart cue, arrive cue]`, `timer: "10 min"` | false,
-`dist: "1.8 km"`, `done: "Delivered"`, `city: city|suburb`. Uses: quick delivery, cab ride, logistics speed, a customer journey.
+**scene** — `set` + `time` + `cast` + `do` + `fx` + `vehicles` + `cam` (+ explainer extras `title`, `labels`, `count`, `cards`).
+- `set`: street (shops, wires, lamps) · city (skyline, road) · highway (hills, poles, dhaba, milestones) ·
+  village (huts, peepal tree, charpai, hand pump) · haveli (old mansion, arched windows, gate, dead tree) ·
+  forest (layered trunks, path) · corridor (one-point hospital/hostel corridor, tube lights, doors) ·
+  room (bed, window, fan, cupboard, door ajar) · station (platform, roof, board, bench, track) ·
+  office · store (shelves, counter, signboard) · plain · black.
+- `time`: day | dusk | night (genre default: explainer day, whatif dusk, horror night). Night = dark,
+  desaturated, windows/lamps glow; characters are lit to match automatically.
+- `sign: "Bhangarh"` text on the set's board (station, store, dhaba) · `opts: {glowWindow: 9}` (haveli: which
+  window glows), `{openDoor: 3, deadLight: 2}` (corridor), `{dhaba: false, sign}` (highway), `{tree: "banyan"}` (village).
+- `cam`: in | out | creep (slow push, horror default) | left | right | still | `{pan: [140, -140], zoom: [1, 1.1]}`;
+  `focus: 1300` = push in toward that screen x.
+- `cast: [{id, preset, x (0-1920), depth (0 front … 1 far back), pose, face, flip, prop, tone, enter, at, scale, tag, look}]`
+  - presets: founder founder-f customer customer-m rider investor employee employee-f shopkeeper student ceo ceo-f
+    oldman auntie farmer · story: watchman trucker nurse doctor baba dadi kid kid-f · horror: ghost-f (white saree,
+    hair over the face, floats, glows) shadow (black figure, red eyes).
+  - poses: idle talk present point pointup think celebrate shrug phone worried facepalm wave cross hold sad
+    cower reach float look torch pray · faces: neutral happy grin worried sad shocked angry smirk talk scared flat evil blank
+  - props: phone cash box sign laptop torch · `tone`: ghost | shadow (silhouette) | none (no night lighting)
+  - `enter`: left | right | up | fade | none (ghosts and shadows fade in by default). `depth` puts a figure further
+    back (smaller, higher up, drawn behind).
+- `do: [{who, at, pose, face, say, hold, move, run: true, dur, prop, flip, appear: 0.2, vanish: 0.4}]` — keyframes;
+  `say` = speech bubble (use sparingly in stories, the narrator tells it), `move` = walk/run to x,
+  `appear`/`vanish` = pop in / fade out at `at` (ghosts).
+- `fx`: fog · mist · rain · wind · dust · fireflies · embers · flicker (lights die and stutter) · crickets ·
+  `{kind: "lightning", at: [...]}` (flash + thunder) · `{kind: "shake", at, amp}` · `{kind: "scare", at}` (punch-in,
+  red flash, stinger — max 1-2 per video) · `{kind: "lightsout", at}` · `{kind: "dark", at, level}` ·
+  `{kind: "torch", who}` (only a torch circle around that character is lit) · `{kind: "heartbeat", at, n}`.
+  Night exteriors in horror get crickets automatically.
+- `vehicles: [{kind: scooter|bike|car|auto|truck|bus, x, to, at: [go, arrive], color, label, accent, scale, y}]`
+  — side view, wheels turn, headlights at dusk/night.
+- explainer extras: `title`, `sub`, `labels: [{text, x, y, at, icon, sub, ac: true}]` (callout chips),
+  `count: {value, label, at, bad}` (corner counter), `cards: 3 | [{title, text, icon, at}]` (phone notifications).
 ```
-@ride {title: "10 minute *delivery*", vehicle: "scooter", from: {label: "Zepto dark store", kind: "darkstore"}, to: {label: "Aapka ghar", kind: "home"}, timer: "8.5 min", dist: "1.8 km", at: ["nikla", "pahunch"]}
+@scene {set: "highway", time: "night", fx: ["fog", {kind: "lightning", at: "bijli"}], vehicles: [{kind: "truck", x: -300, to: 1500, at: ["truck", "ruka"]}], stamp: {place: "NH-48, Rajasthan", time: "Raat 2:14 baje"}}
+@scene {set: "highway", time: "night", cam: "creep", focus: 1300, fx: ["fog"], cast: [{id: "r", preset: "trucker", x: 700, pose: "torch", prop: "torch"}, {id: "g", preset: "ghost-f", x: 1350, at: "safed"}], do: [{who: "r", at: "dekha", face: "scared", pose: "cower"}]}
+@scene {set: "corridor", fx: ["flicker", "dust", {kind: "scare", at: "peeche"}], cast: [{id: "n", preset: "nurse", x: 960, pose: "look"}, {id: "s", preset: "shadow", x: 1130, depth: 0.55, at: "peeche"}], do: [{who: "n", at: "peeche", face: "scared"}]}
+@scene {set: "store", sign: "Zepto dark store", cast: [{id: "a", preset: "employee", x: 520, prop: "box"}], do: [{who: "a", at: "uthate", move: 900}], labels: [{text: "5,000+ items", x: 160, y: 140, at: "shelves"}], cards: 3}
+@scene {set: "office", cast: [{id: "f", preset: "founder", x: 600, tag: "Founder"}, {id: "v", preset: "investor", x: 1250, tag: "VC"}], do: [{who: "v", at: "funding", say: "Aur *funding* chahiye?", pose: "present"}]}
 ```
 
-**cutaway** — building exterior, then the front walls drop and roof lifts: the inside is working.
-`kind: darkstore|warehouse|factory|kitchen|office|kirana`, `sign`, `at` (open cue), `labels: [{text, zone, at}]`
-(zones — darkstore: shelves packing dispatch pickers · warehouse: racks dock staff · factory: line machines workers ·
-kitchen: stoves counter chefs · office: team · kirana: shelves counter customers), `orders: 4 | [{text, title, at}]`
-(phone notifications), `count: {value, label, at}`. Uses: how a dark store / cloud kitchen / factory / office works.
+**ride** — a journey A → B: the vehicle drives while the set scrolls past in layers (loops, so any length works).
+`set` (street | city | highway | village), `time`, `vehicle`, `from: {label, icon}`, `to: {label, icon}`,
+`at: [depart cue, arrive cue]`, `timer: "8.5 min"` (counts up) | false, `dist: "1.8 km"`, `done: "Delivered"`,
+`label` (text on the delivery box / truck), `accent` (rider/box colour), `color` (vehicle), `title`.
 ```
-@cutaway {kind: "darkstore", sign: "Zepto", at: "andar", orders: 3, labels: [{text: "5,000+ items", zone: "shelves", at: "shelves"}, {text: "Packing: 60 sec", zone: "packing", at: "packing"}], count: {value: "1,200", label: "orders / din"}}
-```
-
-**network** — city from above; stores pop up with radius rings, riders zip out. `stores: 9 | [{label, at, kind}]`,
-`kind`, `radius: "2 km"`, `riders` (per store), `count: {value, label, at}`, `city`, `zoom`. Uses: expansion, coverage, density.
-```
-@network {title: "Har *2 km* pe ek store", stores: 9, radius: "2 km", count: {value: "350", label: "dark stores"}}
+@ride {set: "street", vehicle: "scooter", label: "Zepto", from: {label: "Zepto dark store"}, to: {label: "Aapka ghar"}, timer: "8.5 min", dist: "1.8 km", done: "Delivered", at: ["nikla", "pahunch"]}
+@ride {set: "highway", time: "night", vehicle: "car", timer: false, at: ["gaadi", "pahunche"]}
 ```
 
-**chain** — supply chain on a road, vehicles carry goods node to node, camera pans. `steps: [{kind, label, sub, icon,
-edge: "+12%", vehicle, at}]` (2-5), `token: cash` (coin rides along). Uses: farm-to-home, margins at each step, distribution.
-```
-@chain {title: "Saaman kaise pahunchta hai", steps: [{kind: "farm", label: "Kisaan", at: "kisaan"}, {kind: "warehouse", label: "Warehouse", edge: "+12%"}, {kind: "darkstore", label: "Dark store", edge: "+8%"}, {kind: "home", label: "Aap"}]}
-```
-
-**cash** — money in motion. `mode: grow` (stacks pile up) | `burn` (pile on fire, smoke, red counter) | `flow` (coins arc
-`from: {label, kind}` → `to: {label, kind}`, `edge` label, `token: coin|cash`); `value`, `label` (corner counter), `at`.
+**cash** — money in motion (flat 2D bundles of notes). `mode: grow` (stacks rise) | `burn` (layered flames, smoke,
+red counter) | `flow` (notes fly `from: {label, icon}` → `to: {label, icon}`, `edge` label); `value`, `label`
+(corner counter), `at`, `title`, `set`/`time` (default plain).
 ```
 @cash {mode: "burn", title: "Cash *burn*", value: "₹1,250 Cr", label: "loss FY24", at: "jal"}
-@cash {mode: "flow", from: {label: "Customer", kind: "phone"}, to: {label: "Zepto", kind: "office"}, edge: "Delivery fee + margin"}
+@cash {mode: "flow", from: {label: "Customer", icon: "user"}, to: {label: "Zepto", icon: "storefront"}, edge: "Delivery fee + margin"}
 ```
 
-**iso** — free-form world for anything else. `world: {kind: city|suburb|plain, cols, rows, traffic, people}`,
-`place: [{id, model (any node kind), block: [i, j], label, hi, h, color, at}]`, `move: [{model (vehicle), from: id,
-to: id, at: [go, arrive], label, color}]`, `cam: {zoom, follow: 0}`. Blocks: i 0..cols-1, j 0..rows-1.
-```
-@iso {world: {kind: "suburb"}, place: [{id: "k", model: "kirana", block: [1, 1], label: "Kirana"}, {id: "w", model: "warehouse", block: [5, 3], label: "Distributor", hi: true}], move: [{model: "truck", from: "w", to: "k", at: ["truck", "dukaan"], label: "Maal"}], cam: {follow: 0}}
-```
-
-## People layout (story beats; paper-cut characters, no host)
-`set: store|office|street|city|home|stage|plain` · `title`, `sub` ·
-`cast: [{id, preset, x (0-1920), pose, face, flip, prop, sign, tag, enter, look, scale, at}]` ·
-`do: [{who, at, pose, face, say, hold, move, dur, prop}]` (keyframes; `say` = speech bubble, `move` = walk to x).
-- presets: founder, founder-f, customer, customer-m, rider, investor, employee, employee-f, shopkeeper,
-  student, ceo, ceo-f, oldman, auntie, farmer. `look: {topColor, hairColor, skin: s1-s5, glasses, hair, top}` tweaks.
-- poses: idle talk present point pointup think celebrate shrug phone worried facepalm wave cross hold sad
-- faces: neutral happy grin worried sad shocked angry smirk talk · props: phone cash box sign laptop (`sign: "SALE"`)
-- enter: left|right|up|fade|none. Characters blink, breathe and lip-flap while their bubble is up.
-```
-@people {set: "office", cast: [{id: "nk", preset: "founder", x: 640, tag: "Founder"}, {id: "inv", preset: "investor", x: 1300, tag: "VC"}], do: [{who: "inv", at: "funding", say: "Funding chahiye?", pose: "present"}, {who: "nk", at: "nahi", pose: "cross", face: "smirk", say: "Nahi, *shukriya*!"}, {who: "inv", at: "shocked", face: "shocked", pose: "worried"}]}
-```
+**people** — same as `@scene` with `set: plain` by default (paper-cut look on the brand background; older videos).
 
 ## Auto scenes (don't write them)
 title sting (after the hook) · chapter cards (`# Heading`) · subscribe nudge (~40 %, after a payoff) ·

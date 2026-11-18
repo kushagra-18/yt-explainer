@@ -17,6 +17,12 @@
 | Data scene feels empty | Add `note:` (sticky note), `src:`, `sub:`; or use stat/compare instead. |
 | render failed | Shows the last 25 lines of the hyperframes log. Retry once; check disk (needs ≥ 4 GB). |
 | Music too loud/quiet | `audio.py` music gain 0.2, ducks to 0.32 under voice. Per run: `YT_MUSIC=0 yt audio` = no music. |
+| `unknown layout "@cutaway/@network/@chain/@iso"` | Isometric layouts were removed (2D only). The error names the replacement (`@scene`, `@map`, `@flow`, `@ride`). |
+| `two data scenes in a row` / chart budget warning | Replace all but the key number with a story scene (`@scene`, `@ride`, `@cash`, `@photo`). |
+| Character stands inside a prop (pump, bench, cot) | Move its `x`, or `depth: 0.3` to push it back; props are listed per set in video-format.md. |
+| Frame too dark (night / torch / lightsout) | Fewer stacked darkening fx; `torch` with `r: 480`; `dark` with `level: 0.6`; or `time: "dusk"`. |
+| A gradient / glow / headlight missing in a scene | Ids inside sets must be unique per scene (sets.js `uniq`); new set code must go through `build`/`vehicle`. |
+| Scare lands early/late | `at:` must be the exact word; check with `yt plan` (spoken words) and `yt qa <t>` at that second. |
 | Snapshot/render can't load fonts | `yt build` copies fonts into assets/fonts; run it once. |
 
 ## Paths
@@ -29,4 +35,8 @@
 - build.mjs: parse → timeline → cues → index.html. Layout JS = `engine/layouts/*.js` registered via
   `Engine.layout(name, fn(S, p, P))`; add params to `layouts/catalog.json` (validation + docs) and this repo's
   video-format.md when you add/change a layout.
+- 2D sets: `engine/runtime/sets.js` (one lighting model: base colour → desaturate → time-of-day ambient →
+  haze by depth; add a set as `SETS.name = function (D, o) {...}` returning layers [{d, svg}] + floor + light).
+  Scene/ride/cash layouts: `engine/layouts/d-scene.js`. Cast rig + presets: `engine/runtime/people.js`.
+  Genre themes (palette, fonts, transitions, music, grain, vignette): `assets/brand.json` → `genres`.
 - Rendering: hyperframes@0.8.162 (pinned). Snapshots: `yt qa`. Segments are cached by content hash.

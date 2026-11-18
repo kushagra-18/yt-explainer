@@ -1,4 +1,5 @@
 ---
+genre: explainer
 title: "Brand ne *kaise* kiya?"            # title sting; *x* = accent colour
 titles: ["Option 1 (<= 60 chars)", "Option 2", "Option 3"]
 brand: Brand
@@ -31,8 +32,11 @@ The open loop question. Then why it matters to you, and what we will cover.
 @timeline {title: "Shuruaat", items: [{year: "2015", text: "Founded", icon: "rocket-launch"}, {year: "2020", text: "Big moment", icon: "trophy", hi: true}]}
 Story first: the person, the moment, the decision.
 
+@scene {set: "street", cast: [{id: "f", preset: "founder", x: 700, pose: "think"}, {id: "c", preset: "customer", x: 1250, pose: "phone"}], do: [{who: "f", at: "moment", pose: "pointup", face: "grin"}]}
+Show what happened: the place, the people, the moment it clicked.
+
 @bars {title: "Revenue, *₹ crore*", data: {FY21: 100, FY22: 250, FY23: 600}, note: "+140% <small>in one year</small>", src: "Source, FY23"}
-Then the numbers that prove it.
+Then the ONE number that proves it (charts ≤ 15 % of the video, never two in a row).
 
 @statement {text: "Lekin yahan ek *catch* hai.", bg: "accent"}
 Lekin yahan ek catch hai, aur yahin se kahani palat gayi.
