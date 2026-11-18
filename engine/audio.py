@@ -26,6 +26,9 @@ RNG = np.random.default_rng(7)
 TL = json.loads((ROOT / ".yt" / "timeline.json").read_text())
 META = json.loads((ROOT / ".yt" / "meta.json").read_text()) if (ROOT / ".yt" / "meta.json").exists() else {}
 TOTAL = TL["total"]
+BRAND = json.loads((Path(__file__).resolve().parent.parent / "assets" / "brand.json").read_text())
+GENRE = META.get("genre", "explainer")
+MUSIC_KIND = META.get("music_kind") or BRAND.get("genres", {}).get(GENRE, {}).get("music", "groove")
 N = int((TOTAL + 0.5) * SR)
 
 
@@ -164,20 +167,132 @@ def impact():  # hook opener: sub boom + noise burst
     return sweep(90, 35, 1.2) * env(n, 0.002, 3.2) * 1.2 + band(RNG.standard_normal(n), 200, 3000) * env(n, 0.001, 14) * 0.5
 
 
+# ── story / horror SFX (one-shots) ──
+def low_whoosh():
+    return whoosh(0.9, 120, 700) * 0.9
+
+
+def typekey():
+    out = np.zeros(int(0.5 * SR))
+    for i in range(5):
+        n = int(0.03 * SR)
+        k = band(RNG.standard_normal(n), 1500, 6000) * env(n, 0.0005, 120) + 0.4 * sweep(900, 600, 0.03) * env(n, 0.001, 90)
+        place(out, k, i * 0.085 + RNG.uniform(0, 0.02), 0.8 + 0.2 * RNG.uniform())
+    return out
+
+
+def thunder():
+    n = int(4.5 * SR)
+    crack = band(RNG.standard_normal(int(0.25 * SR)), 800, 7000) * env(int(0.25 * SR), 0.001, 12)
+    rum = low(RNG.standard_normal(n), 140) * env(n, 0.05, 0.9) * (1 + 0.6 * np.sin(2 * np.pi * 0.9 * np.arange(n) / SR))
+    out = rum * 3.0
+    place(out, crack, 0.0, 0.8)
+    return out
+
+
+def boom():
+    n = int(3.0 * SR)
+    return sweep(70, 28, 3.0) * env(n, 0.003, 1.4) * 1.3 + low(RNG.standard_normal(n), 400) * env(n, 0.002, 5) * 0.4
+
+
+def stinger():  # dissonant swell (0.35 s) + hit + ringing cluster
+    pre = int(0.35 * SR)
+    t = t_(0.35)
+    sw = sum(np.sin(2 * np.pi * f * t * (1 + 0.6 * t)) for f in (220, 233.1, 311.1)) * (t / 0.35) ** 3 * 0.4
+    n = int(2.2 * SR)
+    tt = t_(2.2)
+    ring = sum(g * np.sin(2 * np.pi * f * tt + 0.3 * np.sin(2 * np.pi * 6 * tt)) for f, g in [(440, 0.5), (466.2, 0.5), (622.3, 0.35), (880, 0.2)]) * env(n, 0.001, 2.2)
+    hit = boom()[:n] * 0.8 + band(RNG.standard_normal(n), 300, 5000) * env(n, 0.0005, 18) * 0.6
+    out = np.zeros(pre + n)
+    out[:pre] += sw
+    out[pre:] += ring * 0.5 + hit
+    return out
+
+
+def heart():
+    n = int(0.6 * SR)
+    beat = lambda: sweep(60, 38, 0.14) * env(int(0.14 * SR), 0.004, 20)
+    out = np.zeros(n)
+    place(out, beat(), 0, 1)
+    place(out, beat(), 0.2, 0.7)
+    return low(out, 200) * 2
+
+
+def switch():
+    n = int(0.05 * SR)
+    return band(RNG.standard_normal(n), 1000, 5000) * env(n, 0.0003, 120) + sweep(2000, 1500, 0.05) * env(n, 0.0005, 150) * 0.3
+
+
+def carpass():
+    n = int(2.4 * SR)
+    p = np.exp(-((np.linspace(-1, 1, n)) ** 2) * 5)
+    return low(RNG.standard_normal(n), 900) * p * 1.6 + sweep(140, 90, 2.4) * p * 0.4
+
+
+def whoosh_low():
+    return whoosh(0.7, 80, 500)
+
+
+# ── beds (stretch to the event's duration) ──
+def bed(kind, d):
+    n = int(max(0.5, d) * SR)
+    tt = np.arange(n) / SR
+    nz = RNG.standard_normal(n)
+    if kind == "rain":
+        x = band(nz, 1500, 9000) * 0.5 + low(nz, 600) * 0.4
+        drops = np.zeros(n)
+        for i in range(int(d * 18)):
+            place(drops, band(RNG.standard_normal(400), 2000, 8000) * env(400, 0.0005, 200), RNG.uniform(0, d), RNG.uniform(0.2, 0.8))
+        x = x + drops
+    elif kind == "wind":
+        g = 0.5 + 0.5 * np.sin(2 * np.pi * 0.11 * tt + 1) * np.sin(2 * np.pi * 0.037 * tt)
+        x = (band(nz, 250, 900) * (0.4 + 0.6 * g) + band(nz, 900, 2500) * 0.25 * g) * 1.3
+    elif kind == "crickets":
+        x = np.zeros(n)
+        for c, f in enumerate([4300, 4700, 5200]):
+            chirp = (np.sin(2 * np.pi * 34 * tt + c) > 0.3) * (np.sin(2 * np.pi * (0.9 + c * 0.13) * tt + c * 2) > 0.2)
+            x += np.sin(2 * np.pi * f * tt) * low(chirp.astype(float), 300) * 0.3
+        x += band(nz, 3000, 7000) * 0.03
+    elif kind == "fire":
+        x = low(nz, 700) * 0.6
+        for i in range(int(d * 14)):
+            place(x, band(RNG.standard_normal(300), 1500, 7000) * env(300, 0.0003, 260), RNG.uniform(0, d), RNG.uniform(0.3, 1))
+    elif kind == "engine":
+        f = 38 + 6 * np.sin(2 * np.pi * 0.3 * tt)
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        x = low(np.sign(np.sin(ph)) * 0.6 + 0.3 * np.sin(2 * ph), 500) + band(nz, 200, 1200) * 0.15
+    else:  # drive: road rumble
+        x = low(nz, 300) * 1.2 + band(nz, 300, 1500) * 0.15
+    fade = min(n // 3, int(0.6 * SR))
+    e = np.ones(n)
+    e[:fade] = np.linspace(0, 1, fade)
+    e[-fade:] = np.linspace(1, 0, fade)
+    return x * e
+
+
+BEDS = {"rain": 0.18, "wind": 0.2, "crickets": 0.1, "fire": 0.22, "engine": 0.16, "drive": 0.16}
+
 SFX = {"pop": (pop, 0.32), "tick": (tick, 0.22), "thud": (thud, 0.5), "whoosh": (whoosh, 0.32), "swish": (swish, 0.32), "whip": (whip, 0.3),
        "ding": (ding, 0.22), "flip": (flip, 0.42), "paper": (paper, 0.45), "stamp": (stamp, 0.45), "scribble": (scribble, 0.22),
-       "counter": (counter, 0.2), "riser": (riser, 0.25), "cash": (cash, 0.3), "impact": (impact, 0.55)}
+       "counter": (counter, 0.2), "riser": (riser, 0.25), "cash": (cash, 0.3), "impact": (impact, 0.55),
+       "low": (low_whoosh, 0.3), "type": (typekey, 0.25), "thunder": (thunder, 0.6), "boom": (boom, 0.55), "stinger": (stinger, 0.5),
+       "heart": (heart, 0.55), "switch": (switch, 0.4), "carpass": (carpass, 0.35), "whoosh-low": (whoosh_low, 0.35)}
 
 
 def sfx_track():
     out = np.zeros(N)
     p = ROOT / ".yt" / "sfx.json"
     ev = json.loads(p.read_text()) if p.exists() else []
-    ev.append([0.0, "impact", 1.0])
-    ev.sort()
+    ev.append([0.0, "boom" if GENRE == "horror" else "impact", 1.0])
+    ev.sort(key=lambda e: e[0])
     last = {}
     cache = {}
-    for t, kind, g in ev:
+    for e in ev:
+        t, kind, g = e[0], e[1], e[2]
+        if kind in BEDS and 0 <= t < TOTAL:
+            x = bed(kind, min(e[3] if len(e) > 3 else 6.0, TOTAL - t))
+            place(out, x / (np.max(np.abs(x)) + 1e-9), t, BEDS[kind] * g)
+            continue
         if kind not in SFX or t < 0 or t >= TOTAL:
             continue
         if t - last.get(kind, -9) < 0.09:  # identical sounds closer than 90 ms smear: keep the first
@@ -270,6 +385,94 @@ def sections():
 
 
 def music():
+    if MUSIC_KIND == "dread":
+        return music_dread()
+    if MUSIC_KIND == "wonder":
+        return music_wonder()
+    return music_groove()
+
+
+def _finish(L, R):
+    st = np.stack([L, R], axis=1)
+    st /= np.max(np.abs(st)) + 1e-9
+    f = int(2.0 * SR)
+    st[-f:] *= np.linspace(1, 0, f)[:, None]
+    st[: int(0.5 * SR)] *= np.linspace(0, 1, int(0.5 * SR))[:, None]
+    return st
+
+
+def music_dread():
+    """Horror bed: a low detuned drone per chapter (key shifts down a semitone each chapter), a slow filter swell,
+    sparse sub pulses, a glassy high cluster that comes and goes, silence-dips on chapter cards."""
+    L, R = np.zeros(N, np.float32), np.zeros(N, np.float32)
+    chs = TL["chapters"]
+    starts = [c["start"] for c in chs] + [TOTAL]
+    for i in range(len(chs)):
+        t0, t1 = starts[i], starts[i + 1]
+        n = int((t1 - t0) * SR)
+        if n <= 0:
+            continue
+        tt = np.arange(n) / SR
+        root = hz(38 - (i % 4))  # D1-ish, sliding down
+        drone = sum(np.sin(2 * np.pi * root * m * tt * (1 + det) + det * 50) * g for m, g, det in [(1, 1, 0), (1, 0.8, 0.004), (2, 0.35, -0.003), (3, 0.12, 0.002)])
+        lfo = 0.55 + 0.45 * np.sin(2 * np.pi * tt / 23 + i)
+        drone = low(drone * (0.6 + 0.4 * lfo), 260)
+        air = band(RNG.standard_normal(n), 180, 700) * 0.18 * lfo
+        gl = np.zeros(n)
+        for k in range(int((t1 - t0) / 9)):
+            s0 = RNG.uniform(0, max(0.1, (t1 - t0) - 6))
+            d = RNG.uniform(4, 7)
+            m = int(d * SR)
+            tq = np.arange(m) / SR
+            f = hz(74 + RNG.choice([0, 1, 6, 7]) - (i % 4))
+            tone = (np.sin(2 * np.pi * f * tq + 0.4 * np.sin(2 * np.pi * 5.2 * tq)) + 0.6 * np.sin(2 * np.pi * f * 1.059 * tq)) * np.sin(np.pi * tq / d) ** 2
+            place(gl, tone * 0.07, s0)
+        pulse = np.zeros(n)
+        for k in range(int((t1 - t0) / 6.5)):
+            place(pulse, sweep(55, 32, 1.6) * env(int(1.6 * SR), 0.004, 2.5) * 0.5, 3 + k * 6.5)
+        x = drone * 0.55 + air + gl + pulse
+        place(L, x.astype(np.float32), t0)
+        place(R, (np.roll(x, 220) * 0.95).astype(np.float32), t0)
+    for s in TL["scenes"]:  # chapter cards: the bed drops out, then returns
+        if s["layout"] in ("chapter", "title"):
+            a, b = int(s["start"] * SR), int((s["start"] + s["dur"]) * SR)
+            g = np.ones(b - a)
+            q = len(g) // 4
+            g[:q] = np.linspace(1, 0.15, q); g[q:-q] = 0.15; g[-q:] = np.linspace(0.15, 1, q)
+            L[a:b] *= g; R[a:b] *= g
+    return _finish(L, R)
+
+
+def music_wonder():
+    """What-if bed: slow pads (add9/maj7), a soft arpeggio, no drums; chord every 2 bars at 70 bpm."""
+    L, R = np.zeros(N, np.float32), np.zeros(N, np.float32)
+    beat = 60 / 70
+    prog = [(0, "add9"), (9, "m7"), (5, "maj7"), (7, "sus")]
+    chs = TL["chapters"]
+    starts = [c["start"] for c in chs] + [TOTAL]
+    for i in range(len(chs)):
+        key = 50 + NOTE[KEYS[i % len(KEYS)]] - 12
+        t, bar = starts[i], 0
+        while t < starts[i + 1] - 0.1:
+            root, q = prog[bar % 4]
+            d = min(8 * beat, starts[i + 1] - t)
+            n = int((d + 1.5) * SR)
+            tt = np.arange(n) / SR
+            pad = sum(np.sin(2 * np.pi * hz(key + 12 + root + iv) * tt * (1 + det)) for iv in QUAL[q] for det in (0, 0.003))
+            e = np.minimum(1, tt / 1.2) * np.minimum(1, np.maximum(0, (d + 1.5 - tt) / 1.5))
+            pad = low(pad * e, 1800) * 0.09
+            place(L, pad.astype(np.float32), t); place(R, (pad * 0.9).astype(np.float32), t + 0.01)
+            for k in range(8):
+                m = key + 24 + root + QUAL[q][[0, 1, 2, 3, 2, 1, 3, 2][k]]
+                tk = t + k * beat
+                if tk < starts[i + 1]:
+                    place(L if k % 2 else R, pluck(m) * 0.05, tk)
+            t += 8 * beat
+            bar += 1
+    return _finish(L, R)
+
+
+def music_groove():
     L, R = np.zeros(N, np.float32), np.zeros(N, np.float32)
     breaks = [(s["start"], s["start"] + s["dur"]) for s in TL["scenes"] if s["layout"] in ("chapter", "title")]
     end_scene = [s for s in TL["scenes"] if s["layout"] == "end"]

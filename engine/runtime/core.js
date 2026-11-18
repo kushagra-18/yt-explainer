@@ -109,6 +109,7 @@
     this.layers = {};
     ['bg', 'mid', 'fg'].forEach(function (k) { var l = el('div', 'layer L-' + k, ''); self.layers[k] = l; self.el.appendChild(l); });
     this.popZone = { x: 1490, y: 120, w: 380 };
+    this.fits = [];
   }
   Scene.prototype = {
     add: function (parent, node) { (typeof parent === 'string' ? this.layers[parent] : parent).appendChild(node); return node; },
@@ -118,7 +119,7 @@
     word: function (w) { w = String(w).toLowerCase(); for (var i = 0; i < this.d.words.length; i++) if (this.d.words[i][0] === w || this.d.words[i][0].indexOf(w) === 0) return this.d.words[i][1]; return null; },
     tw: function (t, d, fn, ease) { this.tws.push({ t: t, d: d, fn: fn, e: E[ease || 'out'] || ease }); return this; },
     every: function (fn) { this.fns.push(fn); return this; },
-    sfx: function (t, kind, gain) { if (typeof t !== 'number' || isNaN(t)) return; SFX.push([+(this.d.start + t).toFixed(3), kind, gain || 1]); },
+    sfx: function (t, kind, gain, dur) { if (typeof t !== 'number' || isNaN(t) || !kind) return; var e = [+(this.d.start + t).toFixed(3), kind, gain || 1]; if (dur) e.push(+dur.toFixed(3)); SFX.push(e); },
     // appear animations; state before t is the "from" pose (hidden)
     anim: function (node, type, t, d, o) {
       o = o || {}; d = d || 0.5;
@@ -143,6 +144,8 @@
       this.tw(t, d, A[type] || A.fade, o.ease || ease);
       return node;
     },
+    // shrink a text node's font-size until it fits w x h (run after fonts load, before the first frame)
+    fit: function (node, w, h) { this.fits.push([node, w, h]); return node; },
     float: function (node, amp, speed, seed) { // gentle idle sway so nothing is ever frozen
       var base = null;
       this.every(function (lt) { if (base === null) base = ''; node.style.translate = '0 ' + (Math.sin(lt * (speed || 1.3) + (seed || 0)) * (amp || 4)).toFixed(2) + 'px'; node.style.rotate = (Math.sin(lt * (speed || 1.3) * 0.7 + (seed || 0) * 2) * (amp || 4) * 0.12).toFixed(3) + 'deg'; });
@@ -168,11 +171,7 @@
       S.add(o.layer || 'mid', box);
       return box;
     },
-    blob: function (S, x, y, r, color, layer) { // big colour disc in the back, drifts slowly
-      var b = S.add(layer || 'bg', el('div', 'blob', 'left:' + (x - r) + 'px;top:' + (y - r) + 'px;width:' + 2 * r + 'px;height:' + 2 * r + 'px;background:' + color));
-      S.anim(b, 'pop', 0, 0.7, { ease: 'soft' });
-      return b;
-    },
+    blob: function () { return el('div', '', 'display:none'); }, // decorative discs removed (read as template filler)
     logo: function (item, size) { // logo image, or a typographic chip in the brand colour
       size = size || 120;
       if (item && item.img && item.img.src) { var w = image(item.img, { logo: true, css: 'width:' + size + 'px;height:' + size + 'px' }); w.className += ' logoimg'; return w; }
@@ -199,14 +198,18 @@
     whip: function (o, n, k) { var e = E.io(k), b = Math.sin(k * Math.PI) * 18; if (o) { o.style.transform = 'translateX(' + (-e * W * 1.1) + 'px)'; o.style.filter = 'blur(' + b + 'px)'; } n.style.transform = 'translateX(' + ((1 - e) * W * 1.1) + 'px)'; n.style.filter = 'blur(' + b + 'px)'; },
     paper: null, // drawn with the overlay sheet in render()
     cut: function (o, n, k) { n.style.opacity = k >= 0.5 ? 1 : 0; },
+    fade: function (o, n, k) { n.style.opacity = E.io(k); },
+    dip: function (o, n, k) { if (o) o.style.opacity = k < 0.5 ? 1 - E.io(k * 2) : 0; n.style.opacity = k < 0.5 ? 0 : E.io((k - 0.5) * 2); },
   };
-  var AUTO = ['push', 'drop', 'zoom', 'wipe', 'whip', 'push', 'drop', 'paper'];
-  var SFX_OF = { push: 'whoosh', drop: 'flip', zoom: 'swish', wipe: 'whoosh', whip: 'whip', paper: 'paper', cut: null };
+  var AUTO = ['push', 'cut', 'whip', 'cut', 'zoom', 'cut'];
+  var SFX_OF = { push: 'whoosh', drop: 'flip', zoom: 'swish', wipe: 'whoosh', whip: 'whip', paper: 'paper', cut: null, fade: null, dip: 'low' };
 
   // ───────── init / render ─────────
   function init(data, rootEl) {
     YT = data; P = data.P; W = data.W; H = data.H; root = rootEl;
-    G.P = P;
+    G.P = P; G.THEME = data.theme || {}; G.GENRE = data.genre || 'explainer';
+    var TH = G.THEME;
+    if (TH.trans) AUTO = TH.trans;
     root.style.cssText += ';position:relative;overflow:hidden;width:' + W + 'px;height:' + H + 'px;background:' + P.bg;
     // shared SVG filters: duotone for photos (ink->card), accent duotone, paper edge for cutouts
     var hex = function (h) { return [1, 3, 5].map(function (i) { return parseInt(h.slice(i, i + 2), 16) / 255; }); };
@@ -215,19 +218,29 @@
       '<svg width="0" height="0"><defs>' + duo('duo', P.ink, P.card) + duo('duoA', P.ink, P.yellow) +
       '<filter id="paperedge" x="-15%" y="-15%" width="130%" height="130%"><feMorphology in="SourceAlpha" operator="dilate" radius="7" result="d"/><feFlood flood-color="' + P.card + '"/><feComposite in2="d" operator="in" result="edge"/><feGaussianBlur in="d" stdDeviation="10" result="b"/><feOffset in="b" dx="6" dy="16" result="o"/><feFlood flood-color="' + P.ink + '" flood-opacity=".28"/><feComposite in2="o" operator="in" result="sh"/><feMerge><feMergeNode in="sh"/><feMergeNode in="edge"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
       '<filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="8"/></filter>' +
+      // character lighting inside sets: dusk (warm, dimmer), night (cold, dark), horror night (colder, desaturated), silhouette, ghost
+      '<filter id="tint-dusk" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".78 .08 0 0 .02  .05 .62 .05 0 0  .05 .05 .62 0 .03  0 0 0 1 0"/></filter>' +
+      '<filter id="tint-night" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".32 .08 .04 0 0  .05 .36 .06 0 .01  .06 .1 .5 0 .04  0 0 0 1 0"/></filter>' +
+      '<filter id="tint-horror" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".36 .17 .07 0 .01  .12 .4 .09 0 .02  .12 .17 .42 0 .03  0 0 0 1 0"/></filter>' +
+      '<filter id="tint-shadow" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 .02  0 0 0 0 .02  0 0 0 0 .03  0 0 0 1 0"/></filter>' +
+      '<filter id="tint-ghost" x="-30%" y="-10%" width="160%" height="120%" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".55 .25 .1 0 .12  .2 .62 .1 0 .14  .2 .25 .6 0 .16  0 0 0 .82 0" result="c"/><feGaussianBlur in="c" stdDeviation="14" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="c"/></feMerge></filter>' +
       '</defs></svg>');
     root.appendChild(defs);
+    root.style.setProperty('--fd', "'" + ((TH.fonts && TH.fonts.display) || 'Khand') + "'"); root.style.setProperty('--fb', "'" + ((TH.fonts && TH.fonts.body) || 'Palanquin') + "'");
+    root.style.setProperty('--up', TH.fonts && TH.fonts.upper === false ? 'none' : 'uppercase'); root.style.setProperty('--deep', P.deep || P.ink); root.style.setProperty('--ondeep', P.onDeep || P.card);
+    root.className += ' g-' + G.GENRE;
     root.style.setProperty('--bg', P.bg); root.style.setProperty('--card', P.card); root.style.setProperty('--ink', P.ink); root.style.setProperty('--ac', P.accent); root.style.setProperty('--y', P.yellow); root.style.setProperty('--teal', P.teal);
     var stage = el('div', 'stage', ''); root.appendChild(stage);
     data.scenes.forEach(function (d, i) {
       var S = new Scene(d);
+      S.el.style.visibility = 'hidden'; stage.appendChild(S.el);
       var fn = LAYOUT[d.layout];
       if (!fn) { S.add('mid', el('div', 'stitle', 'left:120px;top:120px', '<div class="h">missing layout ' + esc(d.layout) + '</div>')); }
       else fn(S, d.p || {}, P, Kit);
       overlaysFor(S, d);
-      S.trans = d.p.trans || (d.layout === 'chapter' ? 'paper' : d.layout === 'title' ? 'zoom' : AUTO[d.i % AUTO.length]);
-      S.el.style.display = 'none';
-      stage.appendChild(S.el);
+      S.fits.forEach(function (f) { var n = f[0], fs = parseFloat(getComputedStyle(n).fontSize), g = 0; while (g++ < 40 && fs > 18 && ((f[1] && n.scrollWidth > f[1] + 1) || (f[2] && n.scrollHeight > f[2] + 1))) { fs *= 0.94; n.style.fontSize = fs.toFixed(1) + 'px'; } });
+      S.trans = d.p.trans || (d.layout === 'chapter' ? (TH.chapterTrans || 'paper') : d.layout === 'title' ? (G.GENRE === 'horror' ? 'dip' : 'zoom') : AUTO[d.i % AUTO.length]);
+      S.el.style.display = 'none'; S.el.style.visibility = '';
       scenes.push(S);
       if (i > 0 || d.start > 0) { var k = SFX_OF[S.trans]; if (k) SFX.push([+(d.start - 0.18).toFixed(3), k, 0.8]); }
     });
@@ -236,20 +249,21 @@
     root.appendChild(sheet); overlays.push({ kind: 'sheet', el: sheet });
     // subscribe nudge
     if (data.nudge !== null && data.nudge !== undefined) {
-      var nd = el('div', 'nudge', '', '<div class="nb">' + icon('bell-ringing', P.card, 46) + '</div><div class="nt">Subscribe<small>' + esc(data.channel || 'naye case studies har hafte') + '</small></div>');
+      var nd = el('div', 'nudge', '', '<div class="nb">' + icon('bell-ringing', P.onDeep || P.card, 46) + '</div><div class="nt">Subscribe<small>' + esc(data.channel || TH.nudge || 'naye case studies har hafte') + '</small></div>');
       root.appendChild(nd); overlays.push({ kind: 'nudge', el: nd, t: data.nudge - data.offset });
       SFX.push([+data.nudge.toFixed(3), 'ding', 0.6]);
     }
-    var grain = el('div', 'grain', ''); root.appendChild(grain); overlays.push({ kind: 'grain', el: grain });
+    if (TH.vignette) { var vg = el('div', 'vignette', 'opacity:' + TH.vignette); root.appendChild(vg); }
+    var grain = el('div', 'grain', TH.grain !== undefined ? 'opacity:' + TH.grain : ''); root.appendChild(grain); overlays.push({ kind: 'grain', el: grain });
     var out = el('script', '', ''); out.type = 'application/json'; out.id = 'yt-sfx'; out.textContent = JSON.stringify(SFX); document.body.appendChild(out);
   }
 
   // keyword pops, source tags, name lower-thirds
   function overlaysFor(S, d) {
     var z = S.popZone;
-    (d.pops || []).forEach(function (pp, i) {
+    (G.THEME.pops === false || d.p.pops === false ? [] : d.pops || []).forEach(function (pp, i) {
       var t = pp.t, next = d.pops[i + 1], end = Math.min(t + 2.6, next ? next.t - 0.05 : S.dur - 0.3);
-      var tilt = (rnd(d.i * 7 + i) - 0.5) * 7;
+      var tilt = 0;
       var n = S.add('fg', el('div', 'pop', 'left:' + z.x + 'px;top:' + z.y + 'px;max-width:' + z.w + 'px;background:' + (i % 2 ? P.ink : P.accent) + ';transform:rotate(' + tilt.toFixed(1) + 'deg)', esc(pp.text)));
       S.tw(t, 0.32, function (k) { n.style.opacity = clamp(k * 4, 0, 1); n.style.scale = String(1 + (1 - k) * 0.8); }, 'out');
       S.tw(end, 0.25, function (k) { if (k > 0) { n.style.opacity = 1 - k; n.style.scale = String(1 - 0.3 * k); } }, 'in');
@@ -259,6 +273,12 @@
       var s = S.add('fg', el('div', 'srctag', '', 'Source: ' + esc(d.p.src)));
       S.anim(s, 'fade', 0.6, 0.5);
     }
+    if (d.p.stamp) {
+      var st = d.p.stamp, tS = S.at(st.at, 0.4), lines = [st.place, st.time, st.date].filter(Boolean);
+      var box = S.add('fg', el('div', 'stamp', ''));
+      lines.forEach(function (ln, i) { var r = el('div', i ? 'st2' : 'st1', '', esc(ln)); box.appendChild(r); S.anim(r, 'type', tS + i * 0.7, Math.min(1.2, ln.length * 0.05)); S.sfx(tS + i * 0.7, 'type', 0.5); });
+      S.tw(tS + (st.hold || 4.5), 0.6, function (k) { if (k > 0) box.style.opacity = 1 - k; });
+    }
     if (d.p.lower) {
       var w = d.p.lower, lt = S.add('fg', el('div', 'lower', '', '<b>' + esc(w.name || w) + '</b>' + (w.role ? '<span>' + esc(w.role) + '</span>' : '')));
       S.anim(lt, 'wipe', S.at(w.at, 0.5), 0.5);
@@ -267,6 +287,7 @@
   }
 
   function camera(S, lt) {
+    if (S.camFn) return S.camFn(lt);
     var k = clamp(lt / Math.max(S.dur, 1), 0, 1), c = S.cam, sc = 1, dx = 0, dy = 0;
     if (c === 'in') { sc = 1 + 0.045 * k; dx = -10 * k; }
     else if (c === 'out') { sc = 1.06 - 0.05 * k; }

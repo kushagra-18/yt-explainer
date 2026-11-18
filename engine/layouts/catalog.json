@@ -297,108 +297,98 @@
  "people": {
   "params": [
    "set",
+   "time",
+   "sign",
+   "opts",
+   "seed",
+   "cast",
+   "do",
+   "fx",
+   "cam",
+   "focus",
    "title",
    "sub",
-   "cast",
-   "do"
+   "labels",
+   "count",
+   "cards",
+   "vehicles"
   ],
-  "required": [
-   "cast"
-  ],
+  "required": [],
   "min": 4,
-  "doc": "Characters in a set (store|office|street|city|home|stage|plain). cast: [{id, preset, x, pose, face, flip, prop, tag, enter, look}], do: [{who, at, pose, face, say, move, prop}]."
+  "doc": "Same as @scene (set defaults to plain)."
  },
  "ride": {
   "params": [
-   "title",
-   "sub",
+   "set",
+   "time",
    "vehicle",
    "from",
    "to",
+   "at",
    "timer",
+   "timerLabel",
    "dist",
    "done",
-   "city",
-   "at"
-  ],
-  "required": [],
-  "min": 5,
-  "doc": "Vehicle crosses an isometric city from A to B, camera following. vehicle: scooter|bike|car|auto|van|truck|bus. from/to: {label, kind: darkstore|shop|kirana|restaurant|warehouse|factory|home|tower|office|bank, icon}. at: [depart cue, arrive cue]. timer: '10 min' (counts up while riding) or false. dist: '2.1 km'. done: arrival stamp text. city: city|suburb."
- },
- "cutaway": {
-  "params": [
-   "title",
-   "sub",
-   "kind",
-   "sign",
    "color",
-   "labels",
-   "orders",
-   "count",
-   "at"
-  ],
-  "required": [],
-  "min": 5,
-  "doc": "Building whose front walls drop and roof lifts to show the inside working. kind: darkstore|warehouse|factory|kitchen|office|kirana. at: open cue. labels: [{text, zone, at}] (zones: darkstore shelves/packing/dispatch/pickers, warehouse racks/dock/staff, factory line/machines/workers, kitchen stoves/counter/chefs, office team, kirana shelves/counter/customers). orders: 4 or [{text, title, at}] phone notifications. count: {value, label, at}."
- },
- "network": {
-  "params": [
+   "accent",
+   "label",
+   "helmet",
+   "scale",
+   "x",
    "title",
    "sub",
-   "stores",
-   "kind",
-   "radius",
-   "riders",
-   "count",
-   "city",
-   "zoom"
+   "opts",
+   "sign",
+   "fx",
+   "seed"
   ],
   "required": [],
   "min": 5,
-  "doc": "City from above; stores pop up with delivery-radius rings and riders zipping out. stores: 8 or [{label, at, kind}]. kind: darkstore|shop|restaurant|warehouse... radius: '2 km'. riders per store (2). count: {value, label, at}. city: city|suburb."
+  "doc": "Side-scrolling journey: vehicle (scooter bike car auto truck bus) crosses a looping 2D set; at: [depart cue, arrive cue]."
  },
  "cash": {
   "params": [
-   "title",
-   "sub",
    "mode",
    "value",
    "label",
+   "at",
    "from",
    "to",
-   "token",
    "edge",
-   "at"
+   "title",
+   "sub",
+   "set",
+   "time",
+   "cam",
+   "fx",
+   "opts",
+   "seed"
   ],
   "required": [],
   "min": 4,
-  "doc": "Money in motion. mode: grow (stacks pile up) | burn (pile burns, smoke; cash burn / losses) | flow (coins arc from `from` to `to` nodes: {label, kind}). value+label: corner counter (counts). token: coin|cash. edge: label over the flow. at: start cue."
+  "doc": "Money in motion, flat 2D. mode: grow | burn | flow (from/to/edge)."
  },
- "chain": {
+ "scene": {
   "params": [
+   "set",
+   "time",
+   "sign",
+   "opts",
+   "seed",
+   "cast",
+   "do",
+   "fx",
+   "cam",
+   "focus",
    "title",
    "sub",
-   "steps",
-   "vehicle",
-   "token"
-  ],
-  "required": [
-   "steps"
-  ],
-  "min": 5,
-  "doc": "Supply chain on a road: steps [{kind: farm|factory|warehouse|darkstore|shop|restaurant|home|bank|office|phone|tower, label, sub, icon, edge: 'text on the road after me', vehicle, at}] 2-5; vehicles carry goods node to node, camera pans. token: cash adds a coin on each vehicle."
- },
- "iso": {
-  "params": [
-   "title",
-   "sub",
-   "world",
-   "place",
-   "move",
-   "cam"
+   "labels",
+   "count",
+   "cards",
+   "vehicles"
   ],
   "required": [],
-  "min": 5,
-  "doc": "Free-form isometric world. world: {kind: city|suburb|plain, cols, rows, traffic, people}. place: [{id, model, block: [i, j], label, hi, h, color, at}]. move: [{model, from: id, to: id, at: [go, arrive], label, color}]. cam: {zoom, follow: move index}."
+  "min": 4,
+  "doc": "2D story scene: set (street city highway village haveli forest corridor room station office store plain black) + time (day dusk night) + cast/do + fx + vehicles + cam."
  }
 }

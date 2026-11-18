@@ -29,7 +29,7 @@
       var b = el('div', 'big', 'font-size:' + size + 'px;color:' + (it.color || (n === 1 || i === n - 1 ? P.accent : P.ink)), K.esc(it.value));
       col.appendChild(b); S.anim(b, 'pop', t, 0.4);
       if (K.parseNum(it.value)) { S.anim(b, 'count', t, 1.2); S.sfx(t, 'counter', 0.6); }
-      if (it.label) { var lb = el('div', '', 'font:600 40px/1.25 Palanquin;color:' + P.ink + ';margin-top:18px;max-width:' + (colW - 60) + 'px', K.rich(it.label)); col.appendChild(lb); S.anim(lb, 'rise', t + 0.35, 0.5, { dist: 20 }); }
+      if (it.label) { var lb = el('div', '', 'font:600 40px/1.25 var(--fb);color:' + P.ink + ';margin-top:18px;max-width:' + (colW - 60) + 'px', K.rich(it.label)); col.appendChild(lb); S.anim(lb, 'rise', t + 0.35, 0.5, { dist: 20 }); }
     });
     if (p.note) K.note(S, p.note.text || p.note, 1440, 820, S.at(p.note.at, S.slot(0, 1, 0.75)), { rot: -3 });
   });
@@ -49,7 +49,7 @@
       S.anim(bar, 'grow', t, 0.6);
       var v = S.add('mid', el('div', 'k', 'position:absolute;left:' + (x - 40) + 'px;width:' + (bw + 80) + 'px;text-align:center;top:' + (base - h - 70) + 'px;font-size:' + (n > 8 ? 42 : 58) + 'px;color:' + (on ? P.accent : P.ink), K.esc(val(r.value, p))));
       S.anim(v, 'rise', t + 0.25, 0.4, { dist: 20 }); S.anim(v, 'count', t, 0.85);
-      var lb = S.add('mid', el('div', '', 'position:absolute;left:' + (x - 50) + 'px;width:' + (bw + 100) + 'px;text-align:center;top:' + (base + 18) + 'px;font:600 ' + (n > 8 ? 26 : 32) + 'px/1.1 Palanquin;color:' + P.ink, K.esc(r.label)));
+      var lb = S.add('mid', el('div', '', 'position:absolute;left:' + (x - 50) + 'px;width:' + (bw + 100) + 'px;text-align:center;top:' + (base + 18) + 'px;font:600 ' + (n > 8 ? 26 : 32) + 'px/1.1 var(--fb);color:' + P.ink, K.esc(r.label)));
       S.anim(lb, 'fade', t, 0.4);
       S.sfx(t, 'tick', 0.45);
       if (on && p.circle !== false) K.annotate(S, x - 60, base - h - 96, bw + 120, 120, S.at(p.at, t + 0.7));
@@ -121,7 +121,7 @@
       var dot = S.add('fg', el('div', '', 'position:absolute;left:' + (x - 14) + 'px;top:' + (y - 14) + 'px;width:28px;height:28px;border-radius:50%;background:' + P.yellow + ';border:5px solid ' + P.ink));
       S.anim(dot, 'pop', t, 0.35);
       var up = y > 560;
-      var card = S.add('fg', K.card('left:' + Math.min(1560, Math.max(100, x - 170)) + 'px;top:' + (up ? y - 200 : y + 50) + 'px;width:340px;padding:16px 20px 12px;font:600 34px/1.2 Palanquin;color:' + P.ink + ';transform:rotate(' + (i % 2 ? 2 : -2) + 'deg)', K.rich(ev.text)));
+      var card = S.add('fg', K.card('left:' + Math.min(1560, Math.max(100, x - 170)) + 'px;top:' + (up ? y - 200 : y + 50) + 'px;width:340px;padding:16px 20px 12px;font:600 34px/1.2 var(--fb);color:' + P.ink + ';transform:rotate(' + (i % 2 ? 2 : -2) + 'deg)', K.rich(ev.text)));
       S.anim(card, 'drop', t + 0.1, 0.45); S.sfx(t, 'pop', 0.5);
     });
     if (p.note) K.note(S, p.note.text || p.note, 1480, 380, S.at(p.note.at, S.slot(0, 1, 0.78)), { rot: 3 });
@@ -164,7 +164,7 @@
     var bx = gx + cols * size * 1.18 + 80;
     var big = S.add('mid', el('div', 'big', 'position:absolute;left:' + bx + 'px;top:' + (gy + 40) + 'px;font-size:240px', K.esc(p.big || String(v) + (tot === 100 ? '%' : '/' + tot))));
     S.anim(big, 'pop', t0, 0.4); S.anim(big, 'count', t0, dur); S.sfx(t0, 'counter', 0.6);
-    if (p.label) { var lb = S.add('mid', el('div', '', 'position:absolute;left:' + bx + 'px;top:' + (gy + 300) + 'px;width:' + (1800 - bx) + 'px;font:600 44px/1.3 Palanquin;color:' + P.ink, K.rich(p.label))); S.anim(lb, 'rise', t0 + 0.5, 0.5); }
+    if (p.label) { var lb = S.add('mid', el('div', '', 'position:absolute;left:' + bx + 'px;top:' + (gy + 300) + 'px;width:' + (1800 - bx) + 'px;font:600 44px/1.3 var(--fb);color:' + P.ink, K.rich(p.label))); S.anim(lb, 'rise', t0 + 0.5, 0.5); }
   });
 
   // COMPARE: A vs B with rows of facts; each row lands on a cue
@@ -186,7 +186,7 @@
       var lab = Array.isArray(r) ? r[0] : r.label, av = Array.isArray(r) ? r[1] : r.a, bv = Array.isArray(r) ? r[2] : r.b, win = Array.isArray(r) ? r[3] : r.win;
       var y = top + 260 + i * rh;
       var row = S.add('mid', el('div', '', 'position:absolute;left:150px;top:' + y + 'px;width:1620px;height:' + (rh - 14) + 'px;background:' + (i % 2 ? 'transparent' : 'rgba(255,248,242,.7)') + ';border-radius:14px'));
-      row.innerHTML = '<div style="position:absolute;left:0;width:1620px;text-align:center;top:' + (rh / 2 - 30) + 'px;font:600 28px/1 Palanquin;color:' + P.ink + ';opacity:.6;text-transform:uppercase;letter-spacing:.08em">' + K.esc(lab) + '</div>' +
+      row.innerHTML = '<div style="position:absolute;left:0;width:1620px;text-align:center;top:' + (rh / 2 - 30) + 'px;font:600 28px/1 var(--fb);color:' + P.ink + ';opacity:.6;text-transform:var(--up);letter-spacing:.08em">' + K.esc(lab) + '</div>' +
         '<div class="k" style="position:absolute;left:70px;width:600px;text-align:center;top:' + (rh / 2 - 36) + 'px;font-size:' + Math.min(72, rh * 0.62) + 'px;color:' + (win === 'a' ? P.accent : P.ink) + '">' + K.rich(av) + '</div>' +
         '<div class="k" style="position:absolute;left:950px;width:600px;text-align:center;top:' + (rh / 2 - 36) + 'px;font-size:' + Math.min(72, rh * 0.62) + 'px;color:' + (win === 'b' ? P.accent : P.ink) + '">' + K.rich(bv) + '</div>';
       S.anim(row, 'rise', t, 0.45, { dist: 30 }); S.sfx(t, 'tick', 0.5);

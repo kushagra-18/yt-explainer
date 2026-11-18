@@ -1,7 +1,8 @@
 # yt-explainer
 
-Claude Code skill: long-form Hinglish YouTube business explainers / case studies, end to end —
-research → script → Sarvam voiceover → collage + data-motion visuals → music/SFX → MP4 + SRT + upload pack.
+Claude Code skill: long-form Hinglish YouTube videos in flat 2D animation — business explainers / case studies,
+horror (bhoot) stories and what-if stories — end to end: research/story → script → Sarvam voiceover →
+illustrated 2D sets + acting cast → music/SFX → MP4 + SRT + upload pack.
 
 ## Install / update (one command, macOS)
 ```bash
@@ -18,5 +19,5 @@ Videos live in `~/yt-explainers/videos/<slug>/`. CLI reference: `yt help`.
 
 ## Layout
 `SKILL.md` workflow · `references/` script craft, video.md format, voice, troubleshooting · `engine/` build,
-voice, audio, assets, render · `assets/` fonts (Khand, Palanquin — OFL), Phosphor icons (MIT), India map data,
-pronunciation lexicon · `examples/template.md` new-video template.
+voice, audio, assets, render · `assets/` fonts (Khand, Palanquin, Crimson Pro — OFL; Special Elite — Apache 2.0), Phosphor icons (MIT), India map data,
+pronunciation lexicon · `examples/template*.md` new-video templates per genre.
